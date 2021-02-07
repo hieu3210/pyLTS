@@ -3,7 +3,7 @@
  
  This project was created by PyCharm
 
-# HA MODEL WITH 2 GENERATORS, 2 HEDGES DEFINITION
+# HA MODEL WITH 2 GENERATORS, 2 HEDGES
 Generators:
 - c_plus = +
 - c_minus = -
