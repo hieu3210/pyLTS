@@ -1,5 +1,5 @@
 # This file for test only
-from HAs.HA import HedgeAlgebras
+from HAs import HedgeAlgebras
 
 theta = 0.55
 alpha = 0.52
