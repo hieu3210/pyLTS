@@ -1,19 +1,13 @@
 # HA MODEL WITH 2 GENERATORS, 2 HEDGES DEFINITION
 # c_plus = +
 # c_minus = -
-# h_minus = L (Little)
-# h_plus = V (Very)
-# alpha = muy(L)
-# theta = fm(c_minus)
 
 class HedgeAlgebras:
-    # Attributes: __alpha, __theta, __beta
-
     # Constructor
     def __init__(self, theta, alpha):
-        self.__alpha = alpha
-        self.__theta = theta
-        self.__beta = 1 - self.__alpha
+        self.__theta = theta    # fm(c_minus)
+        self.__alpha = alpha    # muy(L)
+        self.__beta = 1 - self.__alpha  # muy(V)
 
     # Get words at k level
     def get_words(self, k):
