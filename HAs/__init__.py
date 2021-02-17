@@ -5,9 +5,9 @@
 class HedgeAlgebras:
     # Constructor
     def __init__(self, theta, alpha):
-        self.__theta = theta    # fm(c_minus)
-        self.__alpha = alpha    # muy(L)
-        self.__beta = 1 - self.__alpha  # muy(V)
+        self.theta = theta    # fm(c_minus)
+        self.alpha = alpha    # muy(L)
+        self.beta = 1 - self.alpha  # muy(V)
 
     # Get words at k level
     def get_words(self, k):
@@ -49,14 +49,14 @@ class HedgeAlgebras:
             return 0
         if len(x) == 1:
             if x == "-":
-                return self.__theta
+                return self.theta
             else:
-                return 1 - self.__theta
+                return 1 - self.theta
         else:
             if x[0] == "L":
-                return self.__alpha * self.fm(x[1:])
+                return self.alpha * self.fm(x[1:])
             else:
-                return self.__beta * self.fm(x[1:])
+                return self.beta * self.fm(x[1:])
 
     # Sign between two hedges ...h(2)h(1)...
     @staticmethod
@@ -86,7 +86,7 @@ class HedgeAlgebras:
 
     # Omega para
     def omega(self, x):
-        return (1 + self.sign(x) * self.sign("V" + x) * (self.__beta - self.__alpha)) / 2
+        return (1 + self.sign(x) * self.sign("V" + x) * (self.beta - self.alpha)) / 2
 
     # SQM function
     def sqm(self, x):
@@ -94,12 +94,12 @@ class HedgeAlgebras:
             if x == "0":
                 return 0
             if x == "W":
-                return self.__theta
+                return self.theta
             if x == "1":
                 return 1
             if x == "-":
-                return self.__theta - self.__alpha * self.fm(x)
+                return self.theta - self.alpha * self.fm(x)
             if x == "+":
-                return self.__theta + self.__alpha * self.fm(x)
+                return self.theta + self.alpha * self.fm(x)
         else:
             return self.sqm(x[1:]) + self.sign(x) * (self.fm(x) - self.omega(x) * self.fm(x))  # With 2 hedges only
