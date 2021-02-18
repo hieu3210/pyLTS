@@ -7,10 +7,10 @@ class LTS:
     # Constructor
     def __init__(self, order, repeat, data, lb, ub, words, theta, alpha):
         self.order = order  # The nth-order of LTS
-        self.repeat = repeat  # Weighted or no-weighted with repeat LLRs
+        self.repeat = repeat  # True or False, weighted or no-weighted with repeat LLRs
         self.data = data  # Dataset list []
-        self.lb = lb  # Lower bound of data
-        self.ub = ub  # Upper bound of data
+        self.lb = lb  # Lower bound of universe of discourse
+        self.ub = ub  # Upper bound of universe of discourse
         self.words = words  # Words of HA model using in LTS model
         self.ha = HedgeAlgebras(theta, alpha)  # Instance of HA model to calculate the SQMs of words
         self.lhs = []  # Left hand side list of rules

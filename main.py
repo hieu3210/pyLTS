@@ -23,12 +23,12 @@ repeat = False
 # Create forecasting model
 lts = LTS(order, repeat, data, lb, ub, words, theta, alpha)
 
-print("Words and their SQM:")
+print(str(len(words)) + " words and their SQM:")
 print(words)
 print(lts.get_semantic())
 print(lts.get_real_semantics())
 
-print("Data labels:")
+print("Data labels (" + str(len(data)) + " points):")
 print(lts.get_label_of_data())
 
 lts.get_rules()
@@ -41,8 +41,8 @@ for i in range(len(lts.lhs)):
     print(" => ", end='')
     print(lts.rhs[i])
 
-print("Results:")
 forecasted = lts.get_results()
+print("Results (" + str(len(forecasted)) + " values):")
 print(forecasted)
 
 # Assessment
