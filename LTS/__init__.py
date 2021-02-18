@@ -58,23 +58,16 @@ class LTS:
             lhs = []
             for j in range(i - self.order, i):
                 lhs.append(labels[j])
-            if lhs not in self.lhs:
+            if lhs not in self.lhs:     # Check if the rule not existed
                 self.lhs.append(lhs)
                 self.rhs.append([labels[i]])
-            else:
+            else:                       # or existed
                 pos = self.lhs.index(lhs)
-                rhs = []
-                if type(self.rhs[pos]) != list:  # Check if current RHS is list or string
-                    rhs.append(self.rhs[pos])
-                else:
-                    for r in self.rhs[pos]:
-                        rhs.append(r)
                 if self.repeat:
-                    rhs.append(labels[i])
+                    self.rhs[pos].append(labels[i])
                 else:
-                    if (type(self.rhs[pos]) != str) and (labels[i] not in self.rhs[pos]):
-                        rhs.append(labels[i])
-                self.rhs[pos] = rhs
+                    if labels[i] not in self.rhs[pos]:
+                        self.rhs[pos].append(labels[i])
 
     # Get forecasted results (repeat = True of False)
     def get_results(self):
@@ -88,14 +81,11 @@ class LTS:
             for rule in self.lhs:
                 if lhs == rule:
                     pos = self.lhs.index(rule)     # Position of rule will be used
-                    if type(self.rhs[pos]) != list:
-                        result = self.get_real_semantics()[self.words.index(self.rhs[pos])]
-                    else:
-                        total = 0
-                        count = 0
-                        for r in self.rhs[pos]:
-                            total += self.get_real_semantics()[self.words.index(r)]
-                            count += 1
-                        result = float(total / count)
+                    total = 0
+                    count = 0
+                    for r in self.rhs[pos]:
+                        total += self.get_real_semantics()[self.words.index(r)]
+                        count += 1
+                    result = float(total / count)
             results.append(result)
         return results
