@@ -1,6 +1,5 @@
 # Linguistic Time Series forecasting model
 from HAs import HedgeAlgebras
-import numpy as np
 
 
 class LTS:
@@ -15,6 +14,7 @@ class LTS:
         self.ha = HedgeAlgebras(theta, alpha)  # Instance of HA model to calculate the SQMs of words
         self.lhs = []  # Left hand side list of rules
         self.rhs = []  # Right hand side list of rules
+        self.results = self.get_results()   # Calculate the forecasted results
 
     # Get semantics of words in [0,1]
     def get_semantic(self):
@@ -76,6 +76,7 @@ class LTS:
         results = []
         for i in range(self.order, len(self.data)):
             lhs = []
+            result = 0
             for j in range(i - self.order, i):
                 lhs.append(labels[j])
             for rule in self.lhs:
