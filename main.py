@@ -17,8 +17,8 @@ words = ha.get_words(4)
 # words = ["V-", "-", "L-", "W", "L+", "+", "V+"]
 
 # Time series forecasting model parameters
-order = 2
-repeat = True
+order = 3
+repeat = False
 
 # Create forecasting model
 lts = LTS(order, repeat, data, lb, ub, words, theta, alpha)
@@ -37,7 +37,7 @@ else:
     print("LLRGs (no-repeated):")
 for i in range(len(lts.lhs)):
     print(lts.lhs[i], end='')
-    print(" \u2192 ", end='')
+    print("  \u2192  ", end='')
     print(lts.rhs[i])
 
 forecasted = lts.results
@@ -51,3 +51,4 @@ for i in range(order):
 m = Measure(data, forecasted)
 print("MSE = " + str(m.mse()))
 print("RMSE = " + str(m.rmse()))
+print("MAPE = " + str(m.mape(2)) + "%")

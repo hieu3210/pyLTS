@@ -15,7 +15,7 @@ alpha = 0.5
 
 p = HedgeAlgebras(theta, alpha)
 
-X = p.get_words(7)
+X = p.get_words(3)
 print(len(X))
 print(X)
 for x in X:
