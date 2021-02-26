@@ -17,11 +17,18 @@ class Measure:
         return err
 
     # Error of forecasted results (percentage)
-    def error_percentage(self, round_limit):
+    def error_percentage(self, num_digits):
         err = []
         for i in range(self.length):
-            err.append(round(self.error()[i] / self.actual[i] * 100, round_limit))
+            err.append(round(self.error()[i] / self.actual[i] * 100, num_digits))
         return err
+
+    # Mean Absolute Error
+    def mae(self):
+        err = 0
+        for i in range(self.length):
+            err += self.error()[i]
+        return err / self.length
 
     # Mean Squared Error
     def mse(self):
@@ -35,8 +42,19 @@ class Measure:
         return math.sqrt(self.mse())
 
     # Mean Absolute Percentage Error (%)
-    def mape(self, round_limit):
+    def mape(self, num_digits):
         err = 0
         for i in range(self.length):
             err += abs((self.error()[i]) / self.actual[i])
-        return round((err / self.length * 100), round_limit)
+        return round((err / self.length * 100), num_digits)
+
+    # Symmetric Mean Absolute Percentage Error (%)
+    def smape(self, num_digits):
+        err = 0
+        for i in range(self.length):
+            err += abs(self.error()[i]) / ((abs(self.actual[i]) + abs(self.forecasted[i])) / 2)
+        return round((err / self.length * 100), num_digits)
+
+    # Mean Absolute Scaled Error (%)
+    def mase(self):
+        pass
