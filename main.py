@@ -4,7 +4,7 @@ from LTS import LTS
 from HAs import HedgeAlgebras
 
 # Get dataset
-f = open('datasets/alabama.txt', 'r')
+f = open('datasets/spot_gold.txt', 'r')
 data = list(map(float, f.readline().split(',')))
 lb = float(f.readline())
 ub = float(f.readline())
@@ -13,12 +13,12 @@ ub = float(f.readline())
 theta = 0.46
 alpha = 0.52
 ha = HedgeAlgebras(theta, alpha)
-words = ha.get_words(4)
+words = ha.get_words(3)
 # words = ["V-", "-", "L-", "W", "L+", "+", "V+"]
 
 # Time series forecasting model parameters
 order = 3
-repeat = False
+repeat = True
 
 # Create forecasting model
 lts = LTS(order, repeat, data, lb, ub, words, theta, alpha)
@@ -32,9 +32,9 @@ print("Data labels (" + str(len(data)) + " points):")
 print(lts.get_label_of_data())
 
 if repeat:
-    print("LLRGs (repeated):")
+    print(str(len(lts.lhs)) + " LLRGs (repeated):")
 else:
-    print("LLRGs (no-repeated):")
+    print(str(len(lts.lhs)) + " LLRGs (no-repeated):")
 for i in range(len(lts.lhs)):
     print(lts.lhs[i], end='')
     print("  \u2192  ", end='')

@@ -51,7 +51,7 @@ class LTS:
             label.append(self.words[self.get_real_semantics().index(d)])
         return label
 
-    # Get linguistic logical relationship groups (repeat = True of False)
+    # Get linguistic logical relationship groups
     def get_rules(self):
         labels = self.get_label_of_data()
         for i in range(self.order, len(self.data)):
@@ -69,7 +69,7 @@ class LTS:
                     if labels[i] not in self.rhs[pos]:
                         self.rhs[pos].append(labels[i])
 
-    # Get forecasted results (repeat = True of False)
+    # Get forecasted results
     def get_results(self):
         self.get_rules()
         labels = self.get_label_of_data()

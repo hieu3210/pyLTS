@@ -12,12 +12,13 @@ from HAs import HedgeAlgebras
 # Test HA Model
 theta = 0.5
 alpha = 0.5
-
+#
 p = HedgeAlgebras(theta, alpha)
+#
+# X = p.get_words(3)
+# print(len(X))
+# print(X)
+# for x in X:
+#     print(p.sqm(x))
 
-X = p.get_words(3)
-print(len(X))
-print(X)
-for x in X:
-    print(p.sqm(x))
-
+print(p.sign_between("L","V"))
