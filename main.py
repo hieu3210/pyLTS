@@ -4,7 +4,7 @@ from LTS import LTS
 from HAs import HedgeAlgebras
 
 # Get dataset
-f = open('datasets/spot_gold.txt', 'r')
+f = open('datasets/rice_vietnam.txt', 'r')
 data = list(map(float, f.readline().split(',')))
 lb = float(f.readline())
 ub = float(f.readline())
@@ -17,8 +17,8 @@ words = ha.get_words(3)
 # words = ["V-", "-", "L-", "W", "L+", "+", "V+"]
 
 # Time series forecasting model parameters
-order = 3
-repeat = True
+order = 1
+repeat = False
 
 # Create forecasting model
 lts = LTS(order, repeat, data, lb, ub, words, theta, alpha)
@@ -49,6 +49,7 @@ for i in range(order):
     data.pop(0)
 
 m = Measure(data, forecasted)
+print("MAE = " + str(m.mae()))
 print("MSE = " + str(m.mse()))
 print("RMSE = " + str(m.rmse()))
 print("MAPE = " + str(m.mape(2)) + "%")
