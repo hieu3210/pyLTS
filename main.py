@@ -4,7 +4,7 @@ from LTS import LTS
 from HAs import HedgeAlgebras
 
 # Get dataset
-f = open('datasets/rice_vietnam.txt', 'r')
+f = open('datasets/taifex_1998.txt', 'r')
 data = list(map(float, f.readline().split(',')))
 lb = float(f.readline())
 ub = float(f.readline())
@@ -13,7 +13,7 @@ ub = float(f.readline())
 theta = 0.46
 alpha = 0.52
 ha = HedgeAlgebras(theta, alpha)
-words = ha.get_words(3)
+words = ha.get_words(5)
 # words = ["V-", "-", "L-", "W", "L+", "+", "V+"]
 
 # Time series forecasting model parameters
