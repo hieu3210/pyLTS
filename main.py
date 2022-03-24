@@ -13,7 +13,7 @@ ub = float(f.readline())
 theta = 0.46
 alpha = 0.52
 ha = HedgeAlgebras(theta, alpha)
-words = ha.get_words(5)
+words = ha.get_words(4)
 # words = ["V-", "-", "L-", "W", "L+", "+", "V+"]
 
 # Time series forecasting model parameters
