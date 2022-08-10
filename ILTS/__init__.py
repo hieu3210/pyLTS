@@ -4,16 +4,17 @@ from HAs import HedgeAlgebras
 
 class ILTS:
     # Constructor
-    def __init__(self, order, repeat, data, lb, ub, words, theta, alpha):
+    def __init__(self, order, repeat, data, lb, ub, words, theta, alpha, length):
         self.order = order  # The nth-order of LTS
         self.repeat = repeat  # True or False, weighted or no-weighted with repeat LLRs
+        self.length = length  # The max-length of words in the domain
         self.data = data  # Dataset list []
         self.lb = lb  # Lower bound of universe of discourse
         self.ub = ub  # Upper bound of universe of discourse
         self.words = words  # Words of HA model using in LTS model
         self.ha = HedgeAlgebras(theta, alpha)  # Instance of HA model to calculate the SQMs of words
-        self.lhs = []  # Left hand side list of rules
-        self.rhs = []  # Right hand side list of rules
+        self.lhs = []  # Left-hand side list of rules
+        self.rhs = []  # Right-hand side list of rules
         self.results = self.get_results()   # Calculate the forecasted results
 
     # Get semantics of words in [0,1]
@@ -29,6 +30,24 @@ class ILTS:
         for x in self.get_semantic():
             real_sem.append(self.lb + (self.ub - self.lb) * x)
         return real_sem
+
+    # Get intervals of words in [0,1]
+    def get_interval(self):
+        interval = []
+        pos = 0.
+        interval.append(pos)
+        for x in self.words:
+            if len(x) == self.length:
+                pos = pos + self.ha.fm(x)
+                interval.append(pos)
+        return interval
+
+    # Get real intervals of words in [lb, ub]
+    def get_real_intervals(self):
+        real_interval = []
+        for x in self.get_interval():
+            real_interval.append(self.lb + (self.ub - self.lb) * x)
+        return real_interval
 
     # Get real semantics of historical data by words in HA
     def get_semantic_of_data(self):
