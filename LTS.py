@@ -53,4 +53,3 @@ print("MAE = " + str(m.mae()))
 print("MSE = " + str(m.mse()))
 print("RMSE = " + str(m.rmse()))
 print("MAPE = " + str(m.mape(2)) + "%")
-
