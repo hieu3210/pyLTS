@@ -7,7 +7,7 @@ class HedgeAlgebras:
     def __init__(self, theta, alpha):
         self.theta = theta    # fm(c_minus)
         self.alpha = alpha    # muy(L)
-        self.beta = 1 - self.alpha  # muy(V)
+        self.beta = 1 - alpha  # muy(V)
 
     # Get words at k level
     def get_words(self, k):
@@ -15,74 +15,46 @@ class HedgeAlgebras:
             return ["0", "W", "1"]
         if k == 1:
             return ["0", "-", "W", "+", "1"]
-        # If k >= 2: use recursion to impact (k - 1) length word by hedges
+        
+        # Use recursion to get words of length k - 1
         list_words = self.get_words(k - 1)
-        temp = []
-        # Get words with length = k - 1
-        if k == 2:
-            temp = ["-", "+"]
-        else:
-            for x in list_words:
-                if len(x) == k - 1:
-                    temp.append(x)
+        new_words = []
+
         # Add new words impacted by hedges to list
-        for x in temp:
-            list_words.append("L" + x)
-            list_words.append("V" + x)
-        # Sort the list of words
+        for word in list_words:
+            if len(word) == k - 1:
+                new_words.append("L" + word)
+                new_words.append("V" + word)
+
+        # Combine and sort the list of words
+        list_words.extend(new_words)
         self.sort_words(list_words)
-        # Return list of words
+        
         return list_words
 
     # Sort list words
     def sort_words(self, list_words):
-        for i in range(0, len(list_words) - 1):
-            for j in range(i + 1, len(list_words)):
-                if self.sqm(list_words[i]) > self.sqm(list_words[j]):
-                    temp = list_words[i]
-                    list_words[i] = list_words[j]
-                    list_words[j] = temp
+        list_words.sort(key=self.sqm)
 
     # Fuzzy measure of word hx
     def fm(self, x):
-        if (x == "W") or (x == "0") or (x == "1"):
+        if x in {"W", "0", "1"}:
             return 0
         if len(x) == 1:
-            if x == "-":
-                return self.theta
-            else:
-                return 1 - self.theta
-        else:
-            if x[0] == "L":
-                return self.alpha * self.fm(x[1:])
-            else:
-                return self.beta * self.fm(x[1:])
+            return self.theta if x == "-" else 1 - self.theta
+        return self.alpha * self.fm(x[1:]) if x[0] == "L" else self.beta * self.fm(x[1:])
 
     # Sign between two hedges ...h(2)h(1)...
     @staticmethod
     def sign_between(h2, h1):
-        if h2 == "L":
-            return -1
-        else:
-            return 1
+        return -1 if h2 == "L" else 1
 
     # Sign of word h(n)...h(1)c
     def sign(self, x):
         if len(x) == 1:
-            if x == "-":
-                return -1
-            else:
-                return 1
-        elif len(x) == 2:
-            if x[0] == "L":
-                return (-1) * self.sign(x[1])
-            else:
-                return self.sign(x[1])
-        else:
-            if self.sign_between(x[0], x[1]) == -1:
-                return (-1) * self.sign(x[1:])
-            else:
-                return self.sign(x[1:])
+            return -1 if x == "-" else 1
+        sign_rest = self.sign(x[1:])
+        return sign_rest if x[0] == "V" else -sign_rest
 
     # Omega para
     def omega(self, x):
@@ -90,16 +62,14 @@ class HedgeAlgebras:
 
     # SQM function
     def sqm(self, x):
-        if len(x) == 1:
-            if x == "0":
-                return 0
-            if x == "W":
-                return self.theta
-            if x == "1":
-                return 1
-            if x == "-":
-                return self.theta - self.alpha * self.fm(x)
-            if x == "+":
-                return self.theta + self.alpha * self.fm(x)
-        else:
-            return self.sqm(x[1:]) + self.sign(x) * (self.fm(x) - self.omega(x) * self.fm(x))  # With 2 hedges only
+        if x == "0":
+            return 0
+        if x == "W":
+            return self.theta
+        if x == "1":
+            return 1
+        if x == "-":
+            return self.theta - self.alpha * self.fm(x)
+        if x == "+":
+            return self.theta + self.alpha * self.fm(x)
+        return self.sqm(x[1:]) + self.sign(x) * (self.fm(x) - self.omega(x) * self.fm(x))

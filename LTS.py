@@ -4,7 +4,7 @@ from LTS import LTS
 from HAs import HedgeAlgebras
 
 # Get dataset
-f = open('datasets/alabama.txt', 'r')
+f = open('Datasets/alabama.txt', 'r')
 data = list(map(float, f.readline().split(',')))
 lb = float(f.readline())
 ub = float(f.readline())
@@ -18,7 +18,7 @@ words = ha.get_words(3) # The max-length of words
 
 # Time series forecasting model parameters
 order = 1
-repeat = False
+repeat = True
 
 # Create forecasting model
 lts = LTS(order, repeat, data, lb, ub, words, theta, alpha)
