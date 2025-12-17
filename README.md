@@ -1,10 +1,10 @@
 # pyLTS
 
-pyLTS — Linguistic Time Series Forecasting with Hedge Algebras
+pyLTS — Linguistic Time Series Forecasting based on Hedge Algebras
 
 Abstract
 -------
-pyLTS is a Python implementation of a linguistic time series forecasting framework grounded in Hedge Algebra (HA) theory. The project implements models that represent and reason about imprecise temporal data using linguistic variables, hedges (linguistic modifiers), and algebraic operations defined by HA. The approach is designed for domains where human-like, qualitative descriptions complement or replace purely numerical forecasting (e.g., socio-economic indicators, environmental monitoring, and expert-driven signals).
+pyLTS is a Python implementation of a linguistic time series forecasting framework grounded in Hedge Algebras (HA) theory. The project implements models that represent and reason about imprecise temporal data using linguistic variables, hedges (linguistic modifiers), and algebraic operations defined by HA. The approach is designed for domains where human-like, qualitative descriptions complement or replace purely numerical forecasting (e.g., socio-economic indicators, environmental monitoring, and expert-driven signals).
 
 Key features
 - Model linguistic time series using Hedge Algebras (HA).
@@ -21,9 +21,9 @@ The framework encodes time series observations as linguistic terms drawn from an
 3. Optionally optimizing model parameters (e.g., membership thresholds, hedge strengths) with PSO.
 4. Defuzzifying predicted linguistic terms back to numeric forecasts where required.
 
-Hedge Algebra (HA) background
+Hedge Algebras (HA) background
 ----------------------------
-Hedge Algebra provides an algebraic structure for linguistic variables: a finite set of primary terms (generators) and a family of hedges that modify term intensity. HA defines ordering and combination operations that preserve semantic relationships between terms, enabling rigorous reasoning with qualitative descriptors.
+Hedge Algebras provides an Algebrasic structure for linguistic variables: a finite set of primary terms (generators) and a family of hedges that modify term intensity. HA defines ordering and combination operations that preserve semantic relationships between terms, enabling rigorous reasoning with qualitative descriptors.
 
 Usage
 -----
@@ -43,7 +43,7 @@ This repository contains sample datasets for experimentation in `datasets/` and 
 
 Contributing and citation
 ------------------------
-Contributions are welcome — please open issues or pull requests. If you use pyLTS in your research, please cite the repository and relevant Hedge Algebra literature.
+Contributions are welcome — please open issues or pull requests. If you use pyLTS in your research, please cite the repository and relevant Hedge Algebras literature.
 
 License
 -------
