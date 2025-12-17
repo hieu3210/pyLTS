@@ -15,6 +15,10 @@ import sys
 from typing import List, Tuple
 
 import pandas as pd
+try:
+    import matplotlib.pyplot as plt
+except Exception:
+    plt = None
 
 
 ROOT = os.path.dirname(__file__)
@@ -121,20 +125,59 @@ def run_model(args):
     else:
         raise RuntimeError("No dataset specified. Use --dataset or --csv")
 
-    # Instantiate model
+    # Instantiate model using a local copy of the data to avoid side-effects
     order = args.order
     repeat = args.repeat
+    data_for_model = list(data)
 
     if args.model == "lts":
         ModelClass = getattr(lts_mod, "LTS")
-        model = ModelClass(order, repeat, data, lb, ub, words, theta, alpha)
+        model = ModelClass(order, repeat, data_for_model, lb, ub, words, theta, alpha)
     else:
         if ilts_mod is None:
             raise RuntimeError("ILTS module is not available in this repository. Use --model lts or add ILTS module.")
         ModelClass = getattr(ilts_mod, "ILTS")
-        model = ModelClass(order, repeat, data, lb, ub, words, theta, alpha, args.length)
+        model = ModelClass(order, repeat, data_for_model, lb, ub, words, theta, alpha, args.length)
 
     forecasted = model.results
+
+    # Print detailed outputs mirroring LTS/LTS.py
+    print(str(len(words)) + " words and their SQM:")
+    print(words)
+    # semantics in [0,1]
+    try:
+        print(model.get_semantic())
+    except Exception:
+        pass
+    try:
+        print(model.get_real_semantics())
+    except Exception:
+        pass
+
+    # Data labels
+    try:
+        labels = model.get_label_of_data()
+        print("Data labels (" + str(len(labels)) + " points):")
+        print(labels)
+    except Exception:
+        pass
+
+    # LLRGs (rules)
+    try:
+        if repeat:
+            print(str(len(model.lhs)) + " LLRGs (repeated):")
+        else:
+            print(str(len(model.lhs)) + " LLRGs (no-repeated):")
+        for i in range(len(model.lhs)):
+            print(model.lhs[i], end='')
+            print("  \u2192  ", end='')
+            print(model.rhs[i])
+    except Exception:
+        pass
+
+    # Forecasted results
+    print("Results (" + str(len(forecasted)) + " values):")
+    print(forecasted)
 
     # Optionally save
     if args.output:
@@ -147,14 +190,49 @@ def run_model(args):
             for v in forecasted:
                 writer.writerow([v])
 
-    # Print short report
-    print(f"Model: {args.model}")
-    print(f"Order: {order}, repeat: {repeat}")
-    print(f"Words (k={args.k}): {len(words)}")
-    print(f"Forecasted values: {len(forecasted)}")
-    if args.show:
-        print("Forecasted:")
-        print(forecasted)
+    # Assessment: align actuals (drop first `order` points) and compute errors
+    try:
+        # prefer Errors.Measure module if loaded
+        if errs is not None and hasattr(errs, 'Measure'):
+            MeasureClass = errs.Measure
+        else:
+            from Errors import Measure as MeasureClass
+
+        actual_for_eval = list(data_for_model)[order:]
+        if len(actual_for_eval) > 0 and len(forecasted) > 0:
+            m = MeasureClass(actual_for_eval, forecasted)
+            print("MAE = " + str(m.mae()))
+            print("MSE = " + str(m.mse()))
+            print("RMSE = " + str(m.rmse()))
+            print("MAPE = " + str(m.mape(2)) + "%")
+        else:
+            print("No data available for assessment.")
+    except Exception:
+        pass
+
+    # Plotting: simplified numeric comparison only
+    if args.plot:
+        if plt is None:
+            print("matplotlib not available — install it (pip install matplotlib) to enable plotting.")
+        else:
+            try:
+                # Prepare actual and forecast alignment
+                x = list(range(order, order + max(len(actual_for_eval), len(forecasted))))
+                # Pad shorter series with None so matplotlib aligns indexes
+                actual_plot = list(actual_for_eval) + [None] * (len(x) - len(actual_for_eval))
+                forecast_plot = list(forecasted) + [None] * (len(x) - len(forecasted))
+
+                plt.figure(figsize=(10, 5))
+                plt.plot(x, actual_plot, label='Actual', marker='o')
+                plt.plot(x, forecast_plot, label='Forecast', marker='x')
+                plt.title('Actual vs Forecasted')
+                plt.xlabel('Index')
+                plt.ylabel('Value')
+                plt.legend()
+                plt.grid(True)
+                plt.show()
+            except Exception as e:
+                print('Plotting failed:', str(e))
 
 
 def build_parser():
@@ -174,6 +252,7 @@ def build_parser():
     p.add_argument("--length", type=int, default=3, help="(ILTS) max length of words")
     p.add_argument("--output", help="Save forecasted values to CSV")
     p.add_argument("--show", action="store_true", help="Print forecasted values to stdout")
+    p.add_argument("--plot", action="store_true", help="Show plots comparing original and forecasted series (requires matplotlib)")
     return p
 
 
