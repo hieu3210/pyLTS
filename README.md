@@ -47,8 +47,9 @@ Contributions are welcome — please open issues or pull requests. If you use py
 
 License
 -------
-See the included `LICENSE` for terms.
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0). See the included `LICENSE` file or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 Contact
 -------
-For questions or collaboration, open an issue or contact the repository maintainer.
+For questions or collaboration, open an issue or contact the authors.
+E-mail: hieu3210@gmail.com

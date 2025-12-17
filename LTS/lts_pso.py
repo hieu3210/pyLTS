@@ -1,31 +1,43 @@
-from pyswarm import pso
+try:
+    from pyswarm import pso
+except Exception as e:
+    pso = None
+
 from Errors import Measure
 from LTS import LTS
 from HAs import HedgeAlgebras
+import os
 
-# Đọc dữ liệu từ file
-def read_data(file_path):
-    with open(file_path, 'r') as f:
-        data = list(map(float, f.readline().split(',')))
-        lb = float(f.readline())
-        ub = float(f.readline())
+
+# Read dataset file (path relative to this file)
+def read_data(file_path: str):
+    path = file_path
+    if not os.path.isabs(path):
+        base = os.path.dirname(__file__)
+        path = os.path.join(base, file_path)
+    with open(path, 'r') as f:
+        data = list(map(float, f.readline().strip().split(',')))
+        lb = float(f.readline().strip())
+        ub = float(f.readline().strip())
     return data, lb, ub
 
 # Hàm mục tiêu để tối ưu hóa
 def objective_function(params, data, lb, ub, order, repeat):
-    theta, alpha = params
+    # Do not mutate the input `data` list — make a local copy for evaluation
+    data_copy = list(data)
+    theta, alpha = float(params[0]), float(params[1])
     ha = HedgeAlgebras(theta, alpha)
     words = ha.get_words(3)
-    lts = LTS(order, repeat, data, lb, ub, words, theta, alpha)
+    lts = LTS(order, repeat, data_copy, lb, ub, words, theta, alpha)
     forecasted = lts.results
 
-    # Đánh giá kết quả dự báo
-    if len(data) <= order:
-        return float('inf')  # Trả về giá trị lớn nếu dữ liệu không đủ
+    # Ensure there is enough data for evaluation
+    if len(data_copy) <= order:
+        return float('inf')
 
-    for i in range(order):
-        data.pop(0)
-    m = Measure(data, forecasted)
+    # Align series for error calculation without mutating original list
+    eval_data = list(data_copy)[order:]
+    m = Measure(eval_data, forecasted)
     mse = m.mse()
     return mse
 
@@ -37,11 +49,16 @@ order = 1
 repeat = True
 
 # Giới hạn cho các tham số theta và alpha
-lb_params = [0, 0]
-ub_params = [1, 1]
 
-# Tối ưu hóa bằng PSO
-best_params, best_mse = pso(objective_function, lb_params, ub_params, args=(data, lb, ub, order, repeat), swarmsize=50, maxiter=100)
+# Parameter bounds for theta and alpha
+param_lb = [0.0, 0.0]
+param_ub = [1.0, 1.0]
+
+if pso is None:
+    raise RuntimeError("pyswarm is not available in the environment. Please install it (pip install pyswarm) to run PSO optimization.")
+
+# Run PSO optimization
+best_params, best_mse = pso(objective_function, param_lb, param_ub, args=(data, lb, ub, order, repeat), swarmsize=50, maxiter=100)
 
 # Kết quả tối ưu
 best_theta, best_alpha = best_params
