@@ -1,8 +1,11 @@
-"""Placeholder model wrappers for NEW project.
+"""Model wrappers used by the NEW evaluation harness.
 
-These are minimal classes / interfaces. Implementations will follow after
-we study the PDF describing the target forecasting methods.
+This file provides lightweight wrappers around the repository's LTS
+implementation (HA-LTS) plus standard baselines and statistical models.
+Implementations are defensive: missing optional dependencies produce
+clear runtime errors and simple fallbacks exist for quick evaluation.
 """
+
 from typing import List, Optional, Tuple
 import importlib.util
 import os
@@ -40,7 +43,6 @@ class BaseModel:
 
 
 def _load_lts_modules():
-    # Load HAs and LTS classes from the repository LTS folder
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
     lts_root = os.path.join(repo_root, 'LTS')
     ha_path = os.path.join(lts_root, 'HAs', '__init__.py')
@@ -61,20 +63,22 @@ def _load_lts_modules():
 
 
 class HAWrapLTS(BaseModel):
-    """Wrapper that uses the repository's LTS implementation.
+    """Wrapper that calls the repository LTS implementation.
 
-    This wrapper dynamically loads the `HAs` and `LTS` modules from the
-    repository and uses them to produce forecasts that match the original
-    implementation in `LTS/`.
+    The wrapper implements an iterative multi-step forecasting strategy:
+    to forecast h steps it repeatedly fits the repository LTS on the
+    current history (train + previous predictions) and extracts a one-step
+    forecast. This mirrors common iterative forecasting for models that do
+    not provide direct multi-step forecasts.
     """
 
     def __init__(self, theta: float = 0.57, alpha: float = 0.49, k: int = 3):
         self.theta = float(theta)
         self.alpha = float(alpha)
         self.k = int(k)
-        self.model = None
         self.ha_mod = None
         self.lts_mod = None
+        self._history: List[float] = []
 
     def fit(self, train_series: List[float]):
         ha_mod, lts_mod = _load_lts_modules()
@@ -82,30 +86,77 @@ class HAWrapLTS(BaseModel):
             raise RuntimeError('Could not load LTS modules from repository')
         self.ha_mod = ha_mod
         self.lts_mod = lts_mod
-        HedgeAlgebra = ha_mod.HedgeAlgebras
+        self._history = list(train_series)
+
+    def _one_step_forecast(self, history: List[float]) -> float:
+        # Build HedgeAlgebra and words
+        HedgeAlgebra = self.ha_mod.HedgeAlgebras
         ha = HedgeAlgebra(self.theta, self.alpha)
         words = ha.get_words(self.k)
-        # instantiate repository LTS class
-        LTSClass = lts_mod.LTS
-        # repository LTS expects parameters: order, repeat, data, lb, ub, words, theta, alpha
-        # here we store training series; lb/ub will be inferred from data
-        lb = min(train_series)
-        ub = max(train_series)
-        self.model = LTSClass(1, True, list(train_series), lb, ub, words, self.theta, self.alpha)
+        # Instantiate repository LTS and fit on `history`
+        LTSClass = self.lts_mod.LTS
+        lb = min(history)
+        ub = max(history)
+        model = LTSClass(1, True, list(history), lb, ub, words, self.theta, self.alpha)
+        results = list(getattr(model, 'results', []))
+        if len(results) == 0:
+            return float(history[-1])
+        return float(results[-1])
 
     def predict(self, horizon: int) -> List[float]:
-        if self.model is None:
+        if self.ha_mod is None or self.lts_mod is None:
             raise RuntimeError('Model not fitted')
-        # repository LTS produces results for in-sample forecasting; for multi-step horizon
-        # we will return the last `horizon` values from model.results if available
-        results = list(self.model.results)
-        if len(results) == 0:
-            return [0.0] * horizon
-        # if results shorter than horizon, pad with last value
-        out = results[-horizon:]
-        if len(out) < horizon:
-            out = ([out[-1]] * (horizon - len(out))) + out
-        return [float(x) for x in out]
+        history = list(self._history)
+        out = []
+        for _ in range(horizon):
+            nxt = self._one_step_forecast(history)
+            out.append(nxt)
+            history.append(nxt)
+        return out
+
+
+class PersistenceModel(BaseModel):
+    """Naive persistence (last value) baseline."""
+
+    def __init__(self):
+        self.last = None
+
+    def fit(self, train_series: List[float]):
+        if len(train_series) == 0:
+            raise RuntimeError('Empty series')
+        self.last = float(train_series[-1])
+
+    def predict(self, horizon: int) -> List[float]:
+        if self.last is None:
+            raise RuntimeError('Model not fitted')
+        return [self.last] * horizon
+
+
+class SimpleSESModel(BaseModel):
+    """Simple single-exponential smoothing using statsmodels if available,
+    otherwise fallback to persistence."""
+
+    def __init__(self, smoothing_level: Optional[float] = None):
+        self.smoothing_level = smoothing_level
+        self.model_fit = None
+        self.last = None
+
+    def fit(self, train_series: List[float]):
+        if ExponentialSmoothing is None:
+            # fallback: store last value
+            if len(train_series) == 0:
+                raise RuntimeError('Empty series')
+            self.last = float(train_series[-1])
+            return
+        self.model_fit = ExponentialSmoothing(train_series, seasonal=None).fit(smoothing_level=self.smoothing_level)
+
+    def predict(self, horizon: int) -> List[float]:
+        if self.model_fit is not None:
+            preds = self.model_fit.forecast(steps=horizon)
+            return [float(x) for x in preds]
+        if self.last is not None:
+            return [self.last] * horizon
+        raise RuntimeError('Model not fitted')
 
 
 class ARIMAModel(BaseModel):
@@ -149,6 +200,7 @@ class LagMLModel(BaseModel):
     def __init__(self, lags: int = 5):
         self.lags = int(lags)
         self.model = None
+        self._last_window: List[float] = []
 
     def _make_features(self, series: List[float]):
         X = []
@@ -169,11 +221,11 @@ class LagMLModel(BaseModel):
         else:
             raise RuntimeError('No sklearn regressors available')
         self.model.fit(X, y)
+        self._last_window = list(train_series[-self.lags:])
 
     def predict(self, horizon: int) -> List[float]:
         if self.model is None:
             raise RuntimeError('Model not fitted')
-        # iterative multi-step forecasting
         last_window = list(self._last_window)
         out = []
         for _ in range(horizon):
@@ -181,17 +233,4 @@ class LagMLModel(BaseModel):
             out.append(pred)
             last_window = last_window[1:] + [pred]
         return out
-
-    def fit(self, train_series: List[float]):
-        X, y = self._make_features(train_series)
-        if len(X) == 0:
-            raise RuntimeError('Not enough data for lag features')
-        if RandomForestRegressor is not None:
-            self.model = RandomForestRegressor(n_estimators=100)
-        elif LinearRegression is not None:
-            self.model = LinearRegression()
-        else:
-            raise RuntimeError('No sklearn regressors available')
-        self.model.fit(X, y)
-        self._last_window = train_series[-self.lags:]
 

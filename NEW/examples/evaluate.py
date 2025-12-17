@@ -13,7 +13,7 @@ if repo_root not in sys.path:
 
 from NEW.src.data_loader import read_txt_dataset
 from NEW.src.split import rolling_origin_splits
-from NEW.src.models import HAWrapLTS, ARIMAModel, ETSModel, LagMLModel
+from NEW.src.models import HAWrapLTS, ARIMAModel, ETSModel, LagMLModel, PersistenceModel, SimpleSESModel
 import math
 try:
     import matplotlib.pyplot as plt
@@ -61,6 +61,8 @@ def main():
     n_splits = min(5, possible_splits)
 
     models = [
+        ('Persistence', PersistenceModel()),
+        ('SES', SimpleSESModel()),
         ('HA-LTS', HAWrapLTS()),
         ('ARIMA(1,0,0)', ARIMAModel((1,0,0))),
         ('ETS', ETSModel(seasonal=None, seasonal_periods=None)),
