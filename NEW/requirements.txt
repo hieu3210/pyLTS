@@ -1,9 +1,0 @@
-numpy
-pandas
-matplotlib
-scikit-learn
-statsmodels
-pyswarm
-lightgbm
-# Optional (deep learning): torch, tensorflow
-# torch

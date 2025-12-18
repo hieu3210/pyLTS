@@ -1,21 +1,26 @@
-# NEW — Project scaffold for implementing forecast methods
+Linguistic Time Series (HA-LTS) reproduction notes
 
-Mục tiêu
-- Tạo khuôn khổ (scaffold) để triển khai và so sánh các phương pháp dự báo được mô tả trong tài liệu PDF đính kèm.
+This folder contains files used to reproduce selected experiments from the paper.
 
-Trạng thái hiện tại
-- Thư mục chứa file mẫu: `src/` (loader, splitter, placeholder models) và `examples/`.
+Files generated:
+- `NEW/docs/experiments_extracted.txt`: text excerpt extracted from lts.pdf (Experiments section).
+- `NEW/Datasets/alabama.txt`: dataset copied from original `LTS/Datasets`.
+- `NEW/src/lts_model.py`: simplified HA-LTS implementation following the paper's rules (intervals -> LLRs -> rules).
+- `NEW/examples/run_lts.py`: simple runner that prints next-5 forecasts.
+- `NEW/examples/evaluate_lts.py`: rolling-origin MAE evaluation comparing persistence vs HA-LTS.
+- `NEW/examples/plot_lts.py`: creates `NEW/docs/plots/lts_forecast.png` showing forecasts and baselines.
 
-Tiếp theo cần làm
-1. Cung cấp tệp PDF chứa mô tả phương pháp để tôi nghiên cứu chi tiết.
-2. Tôi sẽ triển khai các mô-đun tính toán theo phương pháp trong PDF (không thay đổi nguyên lý hiện có trong pyLTS trừ khi bạn yêu cầu).
+Quick reproduction
 
-Files
-- `src/data_loader.py` — helper để đọc dataset (định dạng `.txt` giống folder `LTS/Datasets`).
-- `src/split.py` — rolling-origin / expanding-window splitter tiện lợi.
-- `src/models.py` — placeholder wrappers cho các thuật toán (sẽ triển khai sau khi có PDF).
-- `examples/run_example.py` — ví dụ cách nạp dữ liệu và tạo các fold bằng rolling-origin.
-- `requirements.txt` — gợi ý các thư viện cần thiết.
+Create and activate the project's venv, then run:
 
-How to proceed
-- Upload the PDF (or confirm the list of algorithms) and tôi sẽ implement các phương pháp tương ứng trong `NEW/src/models.py`, cùng với tests và notebook minh họa.
+```bash
+.venv/bin/python NEW/examples/plot_lts.py
+```
+
+This will print MAE values and save `NEW/docs/plots/lts_forecast.png`.
+
+Notes and next work
+
+- The implementation is a minimal, interpretable approximation of the HA-LTS rules from the paper. It does not yet implement the full SQM quantification (alpha/beta parameters) — that is a planned improvement.
+- To reproduce the full experiment suite, we need to re-create additional datasets referenced in the paper and tune HA parameters (PSO tuner exists in the repo).
