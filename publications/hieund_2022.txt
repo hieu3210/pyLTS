@@ -1,0 +1,1012 @@
+Proc. of the International Conference on Electrical, Computer and Energy Technologies (ICECET 2022)
+20-22 July 2022, Prague-Czech Republic
+
+A Hybrid Linguistic Time Series Forecasting Model
+combined with Particle Swarm Optimization
+Pham Dinh Phong
+Faculty of Information Technology
+University of Transport and
+Communications
+No. 3, Cau Giay, Hanoi, Vietnam
+phongpd@utc.edu.vn
+
+Nguyen Duy Hieu*
+Faculty of Natural Sciences and
+Technology
+Tay Bac University
+Sonla, Vietnam
+hieund@utb.edu.vn
+
+Abstract— Linguistic time series forecasting model (LTS-FM)
+which is proposed by Hieu et al. by utilizing hedge algebras theory
+is an efficient forecasting model. Instead of partitioning the
+universe of discourse (UD) of the linguistic variable into subintervals and assigning fuzzy sets to them, it establishes a
+formalism to convert historical numeric time series data into
+linguistic one based on numerical semantics of words which are
+transformed from the semantically quantifying mapping (SQM)
+values of the corresponding words. Therefore, a LTS-FM is
+established in such a way that it handles directly words of
+linguistic variable and their qualitative semantics. However, the
+fuzziness parameter values of the LTS-FM which determine the
+SQM values of words are currently specified by human experts, so
+the forecasted results may not be optimal. This paper proposes a
+hybrid LTS-FM in which particle swarm optimization is utilized
+to optimize the fuzziness parameter values. A new formula of
+computing crisp forecasted values is also proposed. The
+experimental studies carried out over two practical forecasting
+problems of the enrollments of University of Alabama and killed
+in car road accident in Belgium show that the proposed forecasting
+model obtains better forecasted results.
+Keywords—linguistic time series, LTS, hedge algebras, linguistic
+logical relationship.
+
+I. INTRODUCTION
+Fuzzy time series forecasting model (FTS-FM) proposed by
+Song and Chissom [1-3] and then enhanced by Chen [4], in
+which fuzzy sets are considered the computational semantics of
+words. In that forecasting model, the universe of discourse (UD)
+of linguistic variable is divided into sub-intervals, fuzzy sets are
+designed on them, and then linguistic words are assigned to the
+designed fuzzy sets. The forecasting procedures are established
+based on fuzzy logical relationships. The studies of them have
+opened a new intensive research field which has been attracting
+the research community publishing their researches to enhance
+the models and solve practical problems. The methodological
+studies in the literature include simplifying computational
+method [4], sub-interval length optimization by applying
+particle swarm optimization (PSO) [5, 16], genetic algorithm
+(GA) [7], etc. or clustering techniques [26], high-order models
+[7, 9], multi-factor models [20], application of efficient
+defuzzification techniques [5, 16], linguistic time series [8, 9,
+18, 23], etc. The application-oriented studies focus on the
+This research is funded by Vietnam Ministry of Education and Training
+under grant number B2022-TTB-01.
+*
+Corresponding author.
+978-1-6654-7087-2/22/$31.00 ©2022 IEEE
+
+Mai Van Linh
+Faculty of Information Technology
+East Asia University of Technology
+Bacninh, Vietnam
+linhmv@eaut.edu.vn
+
+forecasting problems in practice such as the enrollment
+forecasting [2-7], stock index forecasting [16, 20], temperature
+forecasting [20], tourism demand forecasting [21], car road
+accident forecasting [5, 19], spot gold forecasting [5, 19], etc.
+Despite the considerable achievements, there are some
+drawbacks of FTS-FMs which can briefly be described as
+follows:
+•
+
+The word-semantic problem: Although the linguistic
+words present in fuzzy time series with their inherent
+semantics well-familiar with the human users, they are
+only considered as linguistic labels intuitively assigned
+to the designed fuzzy sets. There is no formal
+connection between the inherent semantics of linguistic
+labels with their associated fuzzy sets.
+
+•
+
+The determination of the designed fuzzy sets: It is
+obvious that the inherent semantic of linguistic labels is
+objective because all users understand the same its
+meaning. Meanwhile, the designed fuzzy sets are
+entirely subjective because they depend very much on
+the designers.
+
+With the drawbacks described above, the need of a formal
+formalism that can directly handle linguistic words in solving a
+given time series forecasting problem is arising.
+Hedge algebras (HA) introduced by Nguyen et al. [10, 11]
+model linguistic variables inherent semantic structures in an
+axiomatic way. HA establishes formal formalism to handle
+directly linguistic words and has been applied efficiently in the
+fields of classification [12, 17], regression [13], fuzzy control
+[15], time series forecasting [8, 9, 18, 23], image processing
+[14], and so on. Applied to deal with time series forecasting
+problems, HA establishes a formalism to convert historical
+numeric time series into linguistic time series (LTS) based on
+numerical semantics of words which are computed from the
+semantically quantifying mapping (SQM) values of the
+corresponding words. Then, linguistic logical relationships
+(LLRs) are established from LTS and based on them linguistic
+logical relationship groups (LLRGs) are established. They are
+the basis for establishing forecasting rules. However, we can see
+that although the LTS-FMs proposed in [8, 9, 18, 23] handle
+directly words of linguistic variable, they are still restricted more
+or less in the methodological frame of FTS-FMs. Besides, the
+
+fuzziness parameter values of those LTS-FMs which determine
+the SQM values of words are currently specified by human
+experts. Therefore, the generated LTS may not be optimal
+leading to the forecasting accuracies may not be good enough.
+This paper proposes a method of optimizing the fuzziness
+parameter values of LTS-FMs by utilizing particle swarm
+optimization (PSO) [22] so as to improve their forecasting
+accuracies. A new formula of computing crisp forecasted values
+based on local and global information is also proposed. The
+experimental studies carried out over two real forecasting
+problems of the enrollments of University of Alabama observed
+from 1971 to 1992 (EoU of Alabama) and killed in car road
+accident in Belgium observed from 1974 to 2004 (CRA in
+Belgium) show that the proposed forecasting method obtains
+better forecasted results.
+The rest of the paper is organized as follows. In Section II,
+we recall some related basic knowledge. Section III presents our
+proposed LTS-FM. Some experimental studies are presented in
+Section IV. Some conclusions are drawn out in Section V.
+II. PRELIMINARIES
+A. Fuzzy Time Series and Some Related Concepts
+Because the LTF-FM was formed inspired by the concept of
+fuzzy time series (FTS), for comparison purpose between LTSFM and FTS-FM and to make this study self-contained, some
+basic concepts of FTS will be briefly summarized.
+In [1], Song & Chissom introduced the concept of FTS as
+follows.
+Definition 1. Let
+= 0,1,2, … , which is the subset of real
+numbers, be the universe of discourse on which fuzzy sets
+= 1,2, … are defined. If
+is the collection of
+= 1,2, … then
+is called a fuzzy time series on
+= 0,1,2, … [1, 2].
+Definition 2. Suppose
+is caused by
+− 1 , denoted by
+−1 →
+, then this relationship can be represented as
+the equation
+=
+−1 °
+, − 1 , where
+, − 1 is
+a fuzzy relationship between
+− 1 and
+and '° ' is a
+composition operator [1-3].
+Let
+= ,
+− 1 = , we have the relationship
+→ called fuzzy logical relationship (FLR), where is the
+right-hand side and is the left-hand side of the FLR [4].
+Definition 3. Suppose there are FLRs →
+, →
+, ...,
+→
+with the same left-hand side. Then, they can be
+grouped into a fuzzy logical relationship group (FLRG), denoted
+by →
+, ,…,
+[4].
+The MSE (mean square error) value is used to evaluate the
+forecasting models and is calculated as follows:
+MSE = ∑
+
+−
+
+,
+
+(1)
+
+where Fi is the forecasted data, Ai is the actual data, and n is the
+number of forecasted data.
+In FTS-FM, the authors considered the observations as
+linguistic variables where their values are represented by fuzzy
+
+sets labelled by linguistic words. In [8], Hieu et al. proposed a
+formalism for directly handling words of linguistic variables.
+B. Hedge Algebras - mathematical models of linguistic
+variables
+As aforementioned, the use of fuzzy sets in representing
+semantics of linguistic values has some drawbacks. Hedge
+algebras, which was introduced by N.C. Ho and Wechler [10,
+11], can provide a solid mathematical foundation to formalize
+the word-domain of linguistic variables efficiently.
+Let be a linguistic variable. A hedge algebras (HA) of ,
+denoted by
+, be the 5-tuple , , , , ≤ . In this tuple,
+is the word-domain of ; ≤ is the order relationship on ; =
+!" # , " $ % is the set of atomic antonym called generators. For
+example, if
+=
+& is the age of a person, two its elements
+'old' and 'young' are positive and the negative atomic words,
+respectively. is a set of adverbs called linguistic hedges which
+are considered as unary operators. For instance, # =
+! ' ℎ)*% and $ = !+)*,% can be two opposite hedges which
+have capacity to increase and decrease meaning of any word in
+, i.e, ' ℎ)* ./0 ≤ ./0 and ./0 ≤ +)*, ./0. = !0, 1, 1%
+is the set of three constants, i.e, 'Absolutely young', 'middle' and
+'Absolutely old' for the linguistic variable AGE. Hereafter, we
+summarize some fundamental concepts of HA related to the
+LTS-FM.
+Definition 4. Let 23 = 4, 5, 6, 7, ≤ be a HA. A function
+8: 4 → :;, <= is called 'fuzziness measure' on 4 if:
+•
+•
+•
+•
+
+> 0 = > 1 = > 1 = 0;
+> " # + > " $ = 1;
+∑A∈C > ℎ@ = > @ , for ∀@ ∈ ;
+> AG
+> AF
+=
+. This proportion is
+For ∀E, , ∈ , ∀ℎ ∈ ,
+> F
+
+> G
+
+called fuzziness measure of the hedge ℎ and denoted by
+H ℎ for simplicity.
+The properties of fuzziness measure > of are as follows:
+f1) > ℎE = H ℎ > E , for ∀E ∈ ;
+f2) ∑#IJ JK, LM > ℎ E = > E , E ∈ ;
+f3) N = ∑#IJ J# H ℎ , O = ∑ J JK H ℎ , where N, O > 0
+and N + O = 1, called the total of fuzziness measure of
+negative hedges and positive hedges, respectively.
+For ∀E ∈ , there is a mapping called sign function, which
+determine relations before and after the hedge impact to a
+specific word. This mapping is defined as follows.
+Definition 5. A sign function is a mapping QRST: 4 → !−<, <%
+defined as follows. For U, UV ∈ 7 and W ∈ !W# , W$ %:
+1) X YZ " # = −1, X YZ " $ = +1;
+2) X YZ ℎ" = −X YZ " ( = +X YZ " ) if ℎ is negative
+(positive) w.r.t ";
+3) X YZ ℎV ℎE = −X YZ ℎE (= +X YZ ℎE ) if ℎV ℎE ≠ ℎE
+and ℎV is negative (positive) w.r.t ℎ;
+In the LTS-FM, the quantitative semantic value of used
+words plays an important elements. For a specific HA, when all
+the fuzziness parameter values of the variable are given, the
+quantitative semantics of all linguistic values are calculated as
+the following definition.
+
+Definition 6. The semantically quantifying mapping \:
+:0, 1= is defined as follows:
+
+→
+
+1) \ 1 = ] = > " # ;
+2) \ " # = ] − N> " # and \ " $ = ] + N> " $ ;
+3) \aℎ Eb = \ E + signaℎ Eb ∑ fghi > ℎ E −
+
+Step 1:
+Initialization
+
+Step 2: Determine
+word's
+quantitative
+semantics
+
+Step 3: Mapping to
+real domain
+
+Step 4: Semantize
+the history data
+
+Step 5: Establish
+LLRs and LLRGs
+
+Step 6: Calculate
+the forecasted
+values
+
+ωaℎ Eb>aℎ Eb
+where kaℎ Eb = :1 + signaℎ EbsignaℎK ℎ Eb O − N ∈
+!N, O%.
+Once all the fuzziness parameter values are given, the
+semantically quantifying mapping (SQM) value of words are
+determined. Then, using the linguistic time series concepts, a
+forecasting model will be established [8, 9]. In the next section,
+we will present some LTS concepts and its forecasting model.
+C. Linguistic Time Series and its Forecasting Model
+In the real world, humans use language as a means of
+communication. They also use the linguistic values as the labels
+to collect, store, and process their observed data. Language
+processing in the human brain is a complex process. But in their
+lifetime, sometimes the linguistic information was natural
+collected as a LTS which can be formally defined as follows.
+
+Fig. 1. The linguistic time series forecasting model
+
+The forecasting procedure of LTS-FM with six steps is
+described as follows.
+Step 1. Specify the UD. Establish HA with given fuzzy
+parameter values and appropriate linguistic values (words for
+simplicity).
+
+Definition 7 [8]. Let l be a set of linguistic values of a linguistic
+variable defined on the universe of discourse U to describe
+its numeric quantities. Then, any series L(t), t = 0, 1, 2, …, where
+L(t) is a collection of words of l, is called a linguistic time
+series.
+
+Step 2. Generate the SQM values of the used words using
+Def. 6.
+
+For instance, observing a person's mood at equidistant time
+intervals, we can obtain linguistic time series such as "good",
+"Very good", "Rather good", "normal", "bad", "Rather bad",
+"bad", "Very bad" and so on. This linguistic time series was
+natural built when humans use English to collect the data.
+
+Step 4. Semantize the historical time series data. Use the
+minimum distance from a specific datum to the real semantics
+to determine the word label of this datum.
+
+Because humans collect linguistic data in the real life in the
+chronological order, the time order relationships between
+linguistic values also exist naturally. We call this kind of
+relationship linguistic logical relationships (LLR) and defined
+as follows.
+Definition 8. Suppose and are the linguistic values which
+represent the data at the time and + 1, respectively. There
+exists a relationship between and , and it is called linguistic
+logical relationship (LLR), denoted by → .
+When collecting historical data, there are many relationships
+that arise from one linguistic value can create many other
+linguistic value. In other word, these relationships have the same
+left-hand side. Then, we can then group the LLRs into LLRG as
+defined below.
+Definition 9. Suppose there are LLRs such as →
+, →
+, ..., →
+which have the same left-hand side. They are
+grouped into a linguistic relationship group (LLRG), denoted by
+→
+
+,
+
+,…,
+
+.
+
+The forecasting model for linguistic time series is
+demonstrated as in Fig. 1.
+
+Step 3. Map the SQM values to the UD, then we get a
+collection of real semantics of words.
+
+Step 5. Generate the LLRs and LLRGs between used words.
+Step 6. Forecast based on LLRGs and calculate the crisp
+forecasted values by the principles as follows.
+(1) If linguistic value at a forecasting time, assume m, is
+and its right-hand side is ⟶
+, , … K , o p 1,
+the crisp forecasted value at time m + 1 is X + X +
+⋯ + X K /o where X , X , … X K are the real semantic
+, , … K , respectively.
+(s) of
+(2) If linguistic value at a forecasting time, assume m, is
+and its right-hand side is empty, the crisp forecasted
+value at time m + 1 is X , where X is the real semantic
+of .
+To have more information for the forecasting process, a new
+formula of crisp forecasted values is proposed to applied. It is
+the integration of the local and the global information to enhance
+forecasted accuracy of our proposed model. Therefore, the
+forecasted value of year m + 1 in principle (1) in Step 6 is
+computed as: 0.5 u Xv + X + X + ⋯ + X K /o), where Xv
+is the real semantic of word in the right-hand side of the LLRG.
+D. Particle Swarm Optimization
+Particle swarm optimization (PSO) was introduced by
+Kennedy and Eberhart in 1995 [22]. It really proved to be an
+
+efficient optimization algorithm and has been applied to solve
+many real world problems. The parameters of basic PSO is
+described as follows:
+A swarm S = {x1, x2, …, xN} has N particles and each particle
+t
+xi has its position X i at generation t updated as follows:
+w$
+
+=
+
+w
+
++ + w$
+
+(2)
+
+t +1
+
+where Vi is the velocity at generation t + 1 of particle xi and
+it is updated as follows:
++ w$ = k+ w + " * xw −
+
+w
+
++ " * axyw −
+
+w
+
+b,
+
+(3)
+
+where xw and xyw are the local solution and the best global
+solution found so far; two random numbers r1 and r2 are
+distributed uniformly in [0, 1]; c1, c2 and ω are self-cognitive
+factor, social cognitive factor and inertia weight, respectively.
+The basic PSO procedure is briefly described as follows:
+Step 1: Initialize swarm S which has its velocity vector V and
+position vector X are randomly generated, the variable t
+indicating the current cycle step, and the constant Gmax
+indicating the number of cycles.
+Step 2: Compute new value of f( X it ) which is the objective
+of particle xi.
+Step 3: Compare f( X it ) with the old one of each particle xi. If
+f( X it ) is better, then update Pi t with the current position of xi.
+Step 4: Update the global best position Pgt if there exists
+f( X it ) better the one of all particles in the swarm and the one
+of Pgt .
+Step 5: Update Vi t by Eq. (2) and X it by Eq. (3).
+Step 6: Increase variable t and repeat from Step 2 until the
+value of t greater than the number of cycles Gmax.
+III. A HYBRID FORECASTING MODEL WITH THE COMBINATION
+OF LTS AND PSO
+In this section, a hybrid LTS-FM combined with PSO is
+presented. In the FTS-FMs, the interval lengths of the UD are
+optimized to improve the forecasted accuracies. In LTS-FMs,
+the words of linguistic variable
+induced by the associated
+hedge algebras are used to describe the time series data, the
+fuzziness parameter values including a fuzziness measure of a
+generator word and linguistic hedges are used to generate real
+numerical semantics, based on which the linguistic words are
+assigned to time series data. Therefore, the values of fuzziness
+parameters are very important and should be optimized to
+improve forecasted values. In our experiments, as in [10, 11],
+only two linguistic hedges (Little and Very) are used and the
+number of linguistic words is fixed for each model, so the
+number of the optimized fuzziness parameter values is only 2.
+More specifically, they are the fuzziness measure of one of two
+generator words (e.g. m(c-)) and the one of the hedge Little or
+Very (e.g. H z /) ). We have m(c-) + m(c+) = 1 and
+H z /) + H +)*, = 1, so we can infer that m(c+) = 1 - m(c-
+
+) and H +)*, = 1 − H z /) . Each particle position w =
+{m(c-), H z /) } (i = 1, …, N) in swarm represents those two
+fuzziness parameter values based on which a forecasting
+procedure is implemented. The details of each step of our
+proposed forecasting model are as follows:
+Algorithm 1. LTSPSO.
+Input: The historical data of time series D;
+Parameters: N, Gmax, the syntactic semantics of the
+associated hedge algebras HA;
+//N is the swarm size, Gmax is the number of cycles.
+{
+#
+Output: The best fuzziness parameter values xy |}~ ;
+Begin
+Randomly initialize a swarm S0 = { M ; + M | i = 1, …, N},
+where M = !• " # , H z /) %;
+For i =1 to N do begin
+Implement Step 2 to 6 of LTS-FM based on M ;
+Compute MSE value by the formula (1);
+Update the personal best xM of the particle xi based on
+MSE value;
+End;
+Update the global best position xyM based on MSE values;
+t = 1;
+Repeat
+For i =1 to N do begin
+Update velocity + w of particle xi using (3);
+Update new position w of particle xi using (2);
+Implement Step 2 to 6 of LTS-FM based on w ;
+Compute MSE value of particle xi by formula (1);
+If w is better than w# then
+Update personal best xw of the particle xi; based
+on MSE value;
+End;
+End;
+Update the global best position xyw based on MSE
+values;
+= + 1;
+Until t = Gmax;
+{
+
+#
+
+Return the best solution xy |}~ ;
+End.
+After the optimization process, we receive the best fuzziness
+parameter values (m(c-) and H z /) ) which are used to
+convert numeric time series data into linguistic one.
+IV. EXPERIMENTAL STUDIES AND DISCUSSION
+The aim of this section is to present the experimental studies
+of our proposed forecasting model. The experimental results the
+proposed forecasting models are compared with the existing
+ones to show the outperformance of them.
+A. Experiment Setup
+All our experiments are implemented by C# programming
+language. The experiments are executed on Windows 10, laptop
+
+with Core i5-8250U 1.6 GHz processor, RAM 8GB. The
+parameter values of PSO are as follows: the number of cycles:
+1000, the number of particles: 300, Inertia coefficient: 0.4, c1 =
+c2 = 2.0.
+
+Year
+
+Actual
+
+Uslu
+
+Chen&Zou
+
+Proposed
+
+1989
+
+18970
+
+18880
+
+18937
+
+18911
+
+1990
+
+19328
+
+19418
+
+19345
+
+19439
+
+Each forecasting model applied to solve a given forecasting
+problem is executed three times, so we get three corresponding
+MSE values and the smallest one will be selected for
+experimental result.
+
+1991
+
+19337
+
+19260
+
+19147
+
+19307
+
+1992
+
+18876
+
+19031
+
+19152
+
+19043
+
+42250
+
+23710
+
+22403
+
+B. Forecast Enrollments of University of Alabama
+In this forecasting problem, the syntactical semantics of
+linguistic variable are given as follows:
+-
+
+Two generator " # = X•'// X and " $ = /'*Y) /
+and two hedges z /) z ∈ # , +)*, + ∈ $ .
+
+-
+
+The used word-set is selected from X(3), so have: XL =
+{0, VV_small, V_small, LV_small, small, LL_small,
+L_small, VL_small, medium, VL_large, L_large,
+LL_large, large, LV_large, V_large, VV_large, 1},
+where 0 and 1 stand for Absolutely small and Absolutely
+large, respectively.
+
+-
+
+The historical data of the EoU of Alabama which is
+observed from 1971 to 1992 is ranged from 13055 to
+19337, so the UD of is set to [13000, 20000].
+
+Apply the proposed algorithm LTSPSO to optimize the
+fuzziness parameter values for LTS-FMs, we have m(c-) =
+0.4789 and H z = 0.608, the corresponding MSE value is
+22403, much better than the one of Hieu et al. in [8, 9].
+THE FORECASTED VALUES OF THE EOU OF ALABAMA OF OUR
+PROPOSED MODEL IN COMPARISON WITH THE EXISTING ONES
+
+MSE
+
+To show the efficiency of our proposed model, we do
+compare its forecasted results with the ones of the existing LTSFMs. Table I shows the experimental results of the EoU of
+Alabama of the proposed forecasting model in comparison with
+the forecasting models of Uslu et al. [19] and Chen & Zou [5].
+We can see that the MSE value of our proposed forecasting
+model is 22403, less than the ones of Uslu and Chen & Zou
+which are 42250 and 23710, respectively. Therefore, we can
+state that our proposed forecasting model is very efficient with
+the enrollment forecasting problem.
+C. Forecast Car Road Accident in Belgium
+The syntactical semantics of linguistic variable
+forecasting problem are as follows:
+-
+
+Two generator " # = /.• / and " $ = ℎ Yℎ ℎ and
+two hedges z /) z ∈ # , +)*, + ∈ $ .
+
+-
+
+The used word-set is of the form X(3), so have: XL = {0,
+VV_low, V_low, LV_low, low, LL_low, L_low, VL_low,
+medium, VL_high, L_high, LL_high, high, LV_high,
+V_high, VV_high, 1}, where 0 and 1 stand for
+Absolutely low and Absolutely high, respectively.
+
+-
+
+The UD of
+of the forecasting problem of CRA in
+Belgium is set to [900, 1700].
+
+TABLE I.
+
+Year
+
+Actual
+
+1971
+
+13055
+
+1972
+
+of this
+
+Uslu
+
+Chen&Zou
+
+Proposed
+
+13563
+
+13650
+
+13469
+
+13515
+
+1973
+
+13867
+
+13650
+
+13952
+
+14001
+
+1974
+
+14696
+
+14836
+
+14596
+
+14800
+
+1975
+
+15460
+
+15332
+
+15439
+
+15509
+
+1700
+
+1976
+
+15311
+
+15447
+
+15241
+
+15509
+
+1600
+
+1977
+
+15603
+
+15447
+
+15925
+
+15509
+
+1500
+
+1978
+
+15861
+
+15447
+
+15880
+
+15752
+
+1400
+
+1979
+
+16807
+
+16746
+
+16801
+
+16693
+
+1980
+
+16919
+
+17075
+
+17009
+
+16949
+
+1981
+
+16388
+
+16380
+
+16260
+
+16779
+
+1982
+
+15433
+
+15504
+
+15435
+
+15553
+
+1983
+
+15497
+
+15431
+
+15212
+
+15509
+
+1984
+
+15145
+
+15077
+
+15282
+
+15132
+
+1985
+
+15163
+
+15297
+
+15344
+
+15132
+
+Fig 2. The comparison of car road accident forecasted results
+
+1986
+
+15984
+
+15848
+
+15714
+
+15752
+
+1987
+
+16859
+
+16835
+
+16833
+
+16693
+
+1988
+
+18150
+
+18145
+
+18016
+
+17888
+
+We also apply the proposed algorithm LTSPSO to optimize
+the fuzziness parameter values for LTS-FMs when applied to the
+problem of CRA in Belgium. After the optimization process, we
+get m(c-) = 0.4637 and H z = 0.5713. The MSE values of our
+
+TABLE II.
+
+THE COMPARISON OF MSE VALUE BETWEEN THE PROPOSED
+MODEL AND THE COUNTERPARTS
+
+Forecasting model
+
+Uslu
+
+Chen&Zou
+
+Proposed
+
+MSE
+
+1731
+
+1024
+
+740
+
+1300
+1200
+1100
+1000
+900
+1974
+
+1979
+Actual killed
+
+1984
+
+1989
+Uslu
+
+1994
+Chen&Zou
+
+1999
+
+2004
+Proposed
+
+proposed forecasting model and their counterparts, Uslu et al.
+[19] and Chen & Zou [5], are shown in Table II. The forecasted
+results in detail are visualized in Fig. 2. It is easy to see that the
+MSE value of our proposed forecasting model is 740 which is
+much less than the ones of their counterparts, in turn, of 1731
+and 1024. With these experimental results, we conclude that our
+proposed forecasting model is also very efficient with the
+forecasting problem of CRA in Belgium.
+V. CONCLUSIONS
+The LTS-FMs are developed by utilizing the formalism of
+directly computing with words based on hedge algebras.
+However, the fuzziness parameter values of the existing LTSFMs are specified by human experts, so their forecasted
+accuracies are not quite good. To increase forecasted accuracy,
+this paper presents a method of optimizing the fuzziness
+parameter values of LTS-FMs in order to improve their
+forecasted results. Besides, a new method of computing the crisp
+forecasted results is also proposed. The experimental results
+over two forecasting problems, EoU of Alabama and CRA in
+Belgium, show that our proposed LTS-FM outperforms their
+counterparts. However, there are some characteristics of LTSFMs needed to be examined such as the number of used words,
+the word semantic aspects, etc. They will be examined in our
+next studies.
+REFERENCES
+[1]
+[2]
+[3]
+[4]
+[5]
+
+[6]
+[7]
+
+[8]
+
+Q. Song and B.S. Chissom, “Fuzzy Time Series and its Model”, Fuzzy set
+and systems, vol. 54, pp. 269-277, 1993.
+Q. Song and B.S. Chissom, “Forecasting Enrollments with Fuzzy Time
+Series – Part I”, Fuzzy set and systems, vol. 54, pp. 1-9, 1993.
+Q. Song and B.S. Chissom, “Forecasting Enrollments with Fuzzy Time
+Series – Part II”, Fuzzy set and systems, vol. 62, pp. 1-8, 1994.
+S. M. Chen, “Forecasting Enrollments based on Fuzzy Time Series”,
+Fuzzy set and systems, vol. 81, pp. 311-319, 1996.
+S. M. Chen, X. Y. Zou, and G. C. Gunawan, “Fuzzy time series
+forecasting based on proportions of intervals and particle swarm
+optimization techniques”, vol. 500, pp. 127-139, 2019.
+S. M. Chen, “Forecasting Enrollments Based on High-Order Fuzzy Time
+Series”, Int. Journal: Cybernetic and Systems, no. 33, 2002, pp. 1-16.
+S. M. Chen and N. Y. Chung, “Forecasting enrollments of students by
+using fuzzy time series and genetic algorithms”, International Journal of
+Intelligent Systems, vol. 17, pp. 1–17, 2006a.
+N. D. Hieu, N. C. Ho, and V. N. Lan, “Enrollment forecasting based on
+linguistic time series”, Journal of Computer Science and Cybernetics, vol.
+36, No. 2, pp. 119-137, 2020.
+
+[9]
+
+N. D. Hieu, N. C. Ho and, V. N. Lan, “An efficient fuzzy time series
+forecasting model based on quantifying semantics of words”, 2020 RIVF
+International Conference on Computing and Communication
+Technologies (RIVF), Ho Chi Minh, Vietnam, pp. 1-6, 2020.
+[10] N. C. Ho and W. Wechler, “Hedge Algebras: An algebraic approach to
+structure of sets of linguistic truth values”, Fuzzy Sets and Systems, Vol.
+35, pp. 281–293, 1990.
+[11] N. C. Ho and W. Wechler, “Extended hedge algebras and their application
+to fuzzy logic, Fuzzy Sets and Systems”, Vol. 52, pp. 259–281, 1992.
+[12] N. C. Ho, T. T. Son, and P. D. Phong, “Modeling of a semantics core of
+linguistic terms based on an extension of hedge algebra semantics and its
+application”, Knowledge-Based Systems, vol. 67, pp. 244–262, 2014.
+[13] N. C. Ho, H. V. Thong, and N. V. Long, “A discussion on interpretability
+of linguistic rule based systems and its application to solve regression
+problems”, Knowledge-Based Systems, vol. 88, pp. 107–133, 2015.
+[14] N. H. Huy, N. C. Ho, and N. V. Quyen, “Multichannel image contrast
+enhancement based on linguistic rule-based intensificators”, Applied Soft
+Computing Journal, vol. 76, pp. 744–762, 2019.
+[15] B. H. Le and T. Q. Cao, “A new approach for tuning control rule based
+on hedge algebras theory and application in structural vibration control”,
+Journal of Vibration and Control, vol. 27, no. 23-24, pp. 2686-2700, 2020.
+[16] I-H. Kuo, et al., “Forecasting TAIFEX based on fuzzy time series and
+particle swarm optimization”, Expert Systems with Applications 37,
+1494–1502, 2010.
+[17] P. D. Phong, N. D. Du, N. T. Thuy, and H. V. Thong, “A hedge algebras
+based classification reasoning method with multi-granularity fuzzy
+partitioning”, Journal of Computer Science and Cybernetics, vol. 35, no.
+4, 2019, pp. 319-336.
+[18] P. D. Phong, “A time series forecasting model based on linguistic
+forecasting rules”, Journal of Computer Science and Cybernetics, vol. 37,
+no. 1, 2021, pp. 23-42.
+[19] V. R. Uslu, E. Bas, U. Yolcu, and E. Egrioglu, “A fuzzy time series
+approach based on weights determined by the number of recurrences of
+fuzzy relations”, Swarm and Evolutionary Computation, Vol. 15, pp. 19–
+26, 2014.
+[20] N. Y Wang and S. M. Chen, “Temperature prediction and TAIFEX
+forecasting based on automatic clustering techniques and two-factors
+high-order fuzzy time series”, Expert Systems with Applications, 36,
+2143-2154, 2009.
+[21] C. H. Wang and L. C. Hsu, “Constructing and applying an improved fuzzy
+time series model: Taking the tourism industry for example”, Expert
+Systems with Applications, Vol. 34, pp. 2732-2738, 2008.
+[22] J. Kennedy and R. C. Eberhart, “Particle Swarm Optimization”, In
+Proceedings of the IEEE International Conference on Neural Networks,
+Piscataway, New Jersey. IEEE Service Center, pp. 1942–1948, 1995.
+[23] N. D. Hieu and P. D. Phong, “A Novel High-order Linguistic Time Series
+Forecasting Model with the Growth of Declared Word-set”, International
+Journal of Advanced Computer Science and Applications, vol. 12, no. 6,
+pp. 63-71, 2021.
+
+

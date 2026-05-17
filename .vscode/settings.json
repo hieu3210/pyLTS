@@ -1,0 +1,29 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd /Users/macos/Documents/GitHub/pyLTS/publications && pdftotext hieund_2020\\.pdf hieund_2020\\.txt$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^brew install poppler$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^pdftotext hieund_2020\\.pdf hieund_2020\\.txt && pdftotext hieund_2021\\.pdf hieund_2021\\.txt && pdftotext hieund_2022\\.pdf hieund_2022\\.txt && pdftotext hieund_2023\\.pdf hieund_2023\\.txt$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cp -r /Users/macos/Documents/GitHub/pyLTS/LTS/HAs/\\* /Users/macos/Documents/GitHub/pyLTS/LTS/LTS_2021/HAs/$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cp -r /Users/macos/Documents/GitHub/pyLTS/LTS/Errors /Users/macos/Documents/GitHub/pyLTS/LTS/LTS_2021/ && cp -r /Users/macos/Documents/GitHub/pyLTS/LTS/Datasets /Users/macos/Documents/GitHub/pyLTS/LTS/LTS_2021/$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cp -r /Users/macos/Documents/GitHub/pyLTS/LTS/HAs /Users/macos/Documents/GitHub/pyLTS/LTS/LTS_2022/ && cp -r /Users/macos/Documents/GitHub/pyLTS/LTS/Errors /Users/macos/Documents/GitHub/pyLTS/LTS/LTS_2022/ && cp -r /Users/macos/Documents/GitHub/pyLTS/LTS/Datasets /Users/macos/Documents/GitHub/pyLTS/LTS/LTS_2022/$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    },
+    "python-envs.defaultEnvManager": "ms-python.python:system"
+}

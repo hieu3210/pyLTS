@@ -1,0 +1,1354 @@
+Journal of Computer Science and Cybernetics, V.36, N.2 (2020), 1–
+DOI 10.15625/1813-9663/36/2/14396
+
+ENROLLMENT FORECASTING
+BASED ON LINGUISTIC TIME SERIES
+NGUYEN DUY HIEU1,∗ , NGUYEN CAT HO2 , VU NHU LAN3
+1 Faculty of Natural Sciences and Technology, Tay Bac University, Sonla, Vietnam
+2 Institute of Theoretical and Applied Research, Duy Tan University, Hanoi, Vietnam
+3 Falcuty of Mathematics and Informatics, Thang Long University, Hanoi, Vietnam
+∗ hieund@utb.edu.vn
+
+
+
+Abstract. Dealing with the time series forecasting problem attracts much attention from the fuzzy
+community. Many models and methods have been proposed in the literature since the publication
+of the study by Song and Chissom in 1993, in which they proposed fuzzy time series together with
+its fuzzy forecasting model for time series data and the fuzzy formalism to handle their uncertainty.
+Unfortunately, the proposed method to calculate this fuzzy model was very complex. Then, in 1996,
+Chen proposed an efficient method to reduce the computational complexity of the mentioned formalism. Hwang et al. in 1998 proposed a new fuzzy time series forecasting model, which deals with
+the variations of historical data instead of these historical data themselves. Though fuzzy sets are
+concepts inspired by fuzzy linguistic information, there is no formal bridge to connect the fuzzy sets
+and the inherent quantitative semantics of linguistic words. This study proposes the so-called linguistic time series, in which words with their own semantics are used instead of fuzzy sets. By this,
+forecasting linguistic logical relationships can be established based on the time series variations and
+this is clearly useful for human users. The effect of the proposed model is justified by applying the
+proposed model to forecast student enrollment historical data.
+
+Keywords. Forecasting model; Fuzzy time series; Hedge algebras; Linguistic time series; Linguistic
+logical relationship.
+1.
+
+INTRODUCTION
+
+Fuzzy time series was firstly examined by Song and Chissom in 1993 [1], in which they
+proposed a fuzzy model of time series forecasting to deal with the uncertainty in nature of
+the time series data. Song and Chissom also introduced two forecasting models [2, 3] to
+deal, respectively, with time-invariant or time-variant fuzzy time series and applied them to
+forecast the enrollment time series of Alabama. However, their calculating methods were
+complex and incomprehensible. In 1996, to overcome this difficulty, Chen [4] proposed an
+arithmetic approach to the fuzzy time series forecasting model to simplify the fuzzy forecasting formalism and reduce the computational complexity. He justified that his proposed
+method was more efficient than Song and Chissom’s and it took less computational time
+and offered better accuracy of forecasting results. In [5], Sullivan and Woodall proposed the
+© 2020 Vietnam Academy of Science & Technology
+
+2
+
+NGUYEN DUY HIEU, NGUYEN CAT HO, VU NHU LAN
+
+Markov model, which used linguistic labels with probability distributions to forecast student
+enrollment time series.
+After those initial researches on fuzzy time series, many forecasting models and their
+calculating methods have been proposed mainly to get two aims: to improve the accuracy
+of the forecast results and to simplify the calculation model. In 1998, Hwang et al. [6]
+proposed a new fuzzy time series forecasting model based on the variations of historical data
+instead the time series themselves. This model pays attention to the variability of historical
+data which seems to be an appropriate approach to predict based on the annual variations
+of enrollment numbers. Fuzzy time series is an effective way to deal with uncertain and
+wide-range variation time series data. The calculation with fuzzy time series is mainly based
+on the fuzzy sets that are consistently constructed for the given historical data.
+For nearly three decades, many forecasting methods on fuzzy time series have introduced.
+They extended the fuzzy time series forecasting with high-order models, e.g., [7, 8, 9, 10,
+11, 12], and/or multi-factors models, e.g., [12, 13, 14]. To improve the performance of
+forecasting methods, many modern computation techniques are applied such as artificial
+neural network, e.g., [15, 16], evolutionary computation (genetic algorithm, particle swarm
+optimization), e.g., [11, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26] clustering technique, e.g.,
+[11, 25, 27, 28, 29] and so on. However, the construction of these fuzzy sets still heavily
+relies on the knowledge and experience of the developers. These fuzzy sets constructed for a
+time series are fundamental elements to produce fuzzy logical relationships (FLRs) involved
+in the time series to handle the time series data.
+Fuzzy sets in their nature are originated from fuzzy linguistic words of natural language
+which possess their own qualitative semantics. However, in the fuzzy set framework, there is
+no formal basis to connect fuzzy sets and their associated linguistic words whose semantics is
+represented by their respective fuzzy sets. It is natural and essential that one may actually
+deal with and immediately handle the linguistic labels with their own inherent semantics
+assigned to the fuzzy sets occurring in the fuzzy time series and in its FLRs. However, this
+requires that the word-domains of variable and the inherent semantics of their words must
+be mathematically formalized.
+Hedge algebras (HAs) was introduced in 1990 to formalize the word-domains of variables
+as algebraic order-based structures and the semantics of words are formally defined in their
+respective structures [30]. They establish an algebraic approach to handle fuzzy linguistic
+information in a sound manner. In this approach, the word-domain of a variable is considered as an order-based algebraic structure, whose words are generated from its two atomic
+words with the opposite meaning one to the other by using linguistic hedges regarded as
+unary operations like very, rather, little, extremely, . . . They form a formalism sufficient to
+immediately handle linguistic information and to soundly construct computational objects,
+including fuzzy sets, to represent the inherent semantics of their words. Based on this advantage, HAs were apply to many fields such as fuzzy control, e.g., [31, 32, 33, 34, 35, 36]
+classification and regression problems [37, 38], computing with words [39, 40], image processing [41], and so on.
+Recently, there are some studies applying the HAs theory to the fuzzy time series forecasting problem [42, 43, 44, 45] The main idea of these studies is only to apply the fuzziness
+intervals of words, interpreted as their interval-semantics, to decompose the universe of discourse into an interval-partition instead of determining these intervals based only on the
+
+ENROLLMENT FORECASTING BASED ON LINGUISTIC TIME SERIES
+
+3
+
+researchers’ intuition. The authors of studies [42, 43, 44] proposed a forecasting method
+based on HAs using semantization and desemantization transformations, which are successfully applied in fuzzy control. They tried to determine an interval partition of historical data
+similarly as ordinary fuzzy time series forecasting methods and also made some modifications
+to improve forecasting accuracy, for instance, optimizing the selection of forecasting model
+parameters. Tung et al. [45] proposed a method to construct fuzzy sets for fuzzy time series
+forecasting method which based on HAs to establish a fuzzy partition of dataset range. The
+number of its fuzzy set is also limited by more or less 7. In principle, in this study, there is
+no limitation of the number of words used in the method.
+In this study, based on the HAs formalism, we introduce the so-called linguistic time
+series and the linguistic model of forecasting time series data, in which words and their own
+qualitative semantics are taken into consideration to handle their quantitative semantics,
+especially, fuzzy sets are not necessary to use. Thus, it is interesting that FLRs mentioned
+above can be represented in terms of linguistic words, called linguistic rules, considered as
+linguistic knowledge for forecasting time series data, which are very useful for interacting
+with human users. The proposed linguistic forecasting model ensures that the linguistic
+knowledge formed from the constructed FLRs convey its own inherent semantics of their
+words similar as ordinary human knowledge. This seems to be very essential and useful
+for time series forecasting activities, especially, for the interface between time series data
+forecasting models and their human users.
+The rest of this paper will be organized as follows. In Section 2, we will briefly review
+some concepts of fuzzy time series. In Section 3, some definitions of hedge algebras will be
+introduced. In Section 4, we will propose linguistic time series and its forecasting model.
+We also test the robustness of the proposed model and compare it with the former method.
+The conclusion is covered in Section 5.
+2.
+
+FUZZY TIME SERIES
+
+Fuzzy time series was introduced by Song and Chissom [1] based on the fuzzy set theory
+[46], where the values of historical data are presented by fuzzy sets. In the following, we
+briefly review some basis concepts of fuzzy time series.
+Let U be the universe of discourse, U = {u1 , u2 , ..., un }, where uj ’s are the expected
+intervals of the determined range of the values of a given data time series based on which the
+fuzzy sets used to produce the desired fuzzy time series constructed. These fuzzy sets aim
+to represent the semantics of the human words used to describe the numeric values of the
+time series range mentioned above, e.g., not many, not too many, many, many many, very
+many, too many, too many many [1]. Thus, a fuzzy set A on U can be defined as follows
+A = fA (u1 )/u1 + fA (u2 )/u2 + ... + fA (un )/un ,
+
+(2.1)
+
+where fA is the membership function of A, fA : U → [0, 1], and fA (ui ) indicates the grade
+of membership of ui in A, where fA ∈ [0, 1] and 1 ≤ i ≤ n. The concept of fuzzy time
+series is inspired by the observation given the authors of [1] as follows. Let us imagine a
+series of linguistic values describing the weather of a certain place in north America using
+the word vocabulary good, very good, quite good, very very good, cool, very cool, quite cool,
+hot, very hot, cold, very cold, very very cold,... The weather of a day in summer may be
+
+4
+
+NGUYEN DUY HIEU, NGUYEN CAT HO, VU NHU LAN
+
+described by cool, quite good and that of another day may be hot, very bad . However, in
+winter, such linguistic descriptions may by rather cold, good or very very cold, very very bad ,
+and so on. They argued that the temperature ranges and their set of the possible words
+may be varied from day to day, from season to season, and the semantics of these words
+can be represented by fuzzy sets defined on their respective appropriate real value ranges,
+denoted by Y (t). Thus, the weather F (t) of the day ‘t’ can be represented by some fuzzy sets
+defined on their respective ranges that can be changed in time. Therefore, they introduce
+the following definition.
+Definition 2.1. [1] Let Y (t) (t = ..., 0, 1, 2, ...), a subset of R, be the universe of discourse on
+which fuzzy sets fi (t) (i = 1, 2, ...) are defined and F (t) is the collection of fi (t) (i = 1, 2, ...).
+Then F (t) is called a fuzzy time series on Y (t) (t = ..., 0, 1, 2, ...).
+The relationships between the fuzzy sets (and, hence, between their word-labels) are
+important for forecasting problem that is formalized in [1] by the following definition.
+Definition 2.2. [4] Assume that there exists a fuzzy relationship R(t − 1, t), such that
+F (t) = F (t − 1) ◦ R(t − 1, t) where ‘◦’ represents a composition operator, then F (t) is said
+to be caused by F (t − 1). When F (t − 1) = Ai and F (t) = Aj , the relationship between
+F (t − 1) and F (t) is denoted by the fuzzy logical relationship (FLR)
+Ai → Aj ,
+
+(2.2)
+
+where Ai and Aj are called the left-hand side and the right-hand side of the FLR, respectively.
+In [2, 3], R is determined by a fuzzy relation, which is calculated by Rj = [F (t − 1)]T ×
+F (t), t = 1, 2, ..., j = 1, ..., p. Assuming that the fuzzy time series under consideration has
+p FLRs in the form Ai → Aj , where Al ’s are fuzzy sets defined on the set of uk , k = 1, ..., n,
+which are the intervals defined by a partition of the ordinary time data series, we have then
+p such fuzzy relations, Rj , j = 1, ..., p.
+Putting R = ∪pj=1 Rj , the forecasting model is defined as
+Ai = Ai−1 ◦ R,
+
+(2.3)
+
+where Ai−1 is the enrollment of year i − 1 and Ai is the forecasted enrollment of year i in
+terms of fuzzy sets and ‘◦’ is the ‘max-min’ operator.
+Chen in [4] argued that the derivation of the fuzzy relation R is a very tedious work,
+and the forecasting calculation by the above forecasting model is too complex, especially
+when the fuzzy time series is large. Therefore, he proposed a so-called arithmetic method to
+compute the forecasting values based on utilizing, for a given Ai , the midpoints of the cores
+of the fuzzy sets of Aj ’s occurring on the right-hand side of those FLRs of the form (2.2)
+whose left-hand side are the same Ai . Thus, he introduced fuzzy logical relationship group
+defined as follows.
+Definition 2.3. [4] Suppose there are FLRs such that
+Ai → Aj1 , Ai → Aj2 , ..., Ai → Ajn .
+Then, they can be grouped into a fuzzy logical relationship group (FLRG) and denoted by
+Ai → Aj1 , Aj2 , ..., Ajn .
+
+(2.4)
+
+ENROLLMENT FORECASTING BASED ON LINGUISTIC TIME SERIES
+
+5
+
+Chen’s method can be shortly described by the following steps:
+Step 1. Partition the universe of discourse into equal-length intervals.
+Step 2. Define fuzzy sets on the universe of discourse. Fuzzify the historical data and
+establish the fuzzy logical relationship based on fuzzified historical data.
+Step 3. Group fuzzy logical relationship with one or more fuzzy sets on the right-hand side.
+Step 4. Calculate the forecasted outputs.
+In Step 4, Chen carried out the outputs of the experiment on enrollments by three
+principles:
+(1) If the fuzzified enrollment of year i is Aj , and there is only one fuzzy logical relationship
+in the fuzzy logical relationship groups which is show as follows Aj → Ak where Aj
+and Ak are fuzzy sets and the maximum membership value of Ak occurs at interval uk ,
+and the midpoint of uk is mk , then the forecasted enrollment of year i + 1 is mk .
+(2) If the fuzzified enrollment of year i is Aj , and there are the following fuzzy logical relationships in the fuzzy logical relationship groups Aj → Ak1 , Ak2 , ..., Akp where
+Aj , Ak1 , Ak2 , ..., Akp are fuzzy sets, and the maximum membership values of Ak1 , Ak2 , ...,
+Akp occur at intervals u1 , u2 , ..., up , respectively and the midpoints of u1 , u2 , ..., up are
+m1 , m2 , ..., mp , respectively, then the forecasted enrollment of year i + 1 is (m1 + m2 +
+... + mp )/p.
+(3) If the fuzzified enrollment of year i is Aj , and there do not exist any fuzzy logical
+relationship groups whose current state of the enrollment is Aj ,where the maximum
+membership value of Aj occurs at interval uj and the midpoint of uj is mj , then the
+forecasted enrollment of year i + 1 is mj .
+There has been a lot of researches to improve the calculation models as mentioned above.
+In general, the fuzzy set theory approach is very flexible, especially, for the time series
+modeled in terms of linguistic words or for those whose number of observations is small.
+However, analyzing these forecasting methods based on fuzzy time series, we observe that
+the fuzzy sets Aj ’s are constructed based only on the researcher’s intuition inspired by the
+semantics of human linguistic words in the aforementioned word-vocabularies. In the matter
+of fact, there is no formal linkage between human words and the fuzzy sets assigned to them.
+This motivates us to introduce the so-called linguistic time series based on hedges algebras
+and their quantification theory.
+3.
+
+HEDGE ALGEBRAS AND SEMANTICS OF WORDS
+
+The motivation of hedge algebras (HAs) approach is to interpret each words-set of a
+linguistic variable as an algebra whose order-based structure is induced by the inherent
+qualitative meaning of linguistic words. By this, its order relation is called semantical order
+relation.
+In this section, we recall some basic concepts of HAs. As mentioned above, the ordering
+relation of linguistic values creates their semantics. We focus on fuzziness measure (f m),
+sign function, and semantically quantifying mappings (SQMs) of HAs. They are necessary
+mathematical knowledge of HAs that will be used to present our proposed forecasting model.
+More details can be found in [37] or [47].
+
+6
+
+NGUYEN DUY HIEU, NGUYEN CAT HO, VU NHU LAN
+
+Let AX = (X, G, C, H, ≤) be an HAs, where G = {c− , c+ } is a set of generators called,
+respectively, the negative primary word and the positive one of X; C = {0, W, 1} is set of
+constant which are the least, the neutral and the greatest, respectively; H = {h− , h+ } is a
+set of hedges of X, regarded as unary operations, where h− and h+ are the negative hedge
+and positive one, respectively; and ≤ is the semantic order relation of words in X.
+Definition 3.1. Let AX = (X, G, C, H, ≤) be an HAs. A function f m : X → [0, 1] is said
+to be fuzziness measure of words in X if
+P
+• f m(c− ) + f m(c+ ) = 1 and
+f m(hu) = f m(u), for ∀u ∈ X;
+(h∈H)
+
+•
+•
+
+For the constants 0, W and 1: f m(0) = f m(W ) = f m(1) = 0;
+f m(hx)
+f m(hy)
+=
+, this proportion does not depend on
+f m(x)
+f m(y)
+specific elements x and y and, hence, it is called fuzziness measure of the hedge h and
+denoted by µ(h).
+For ∀x, y ∈ X, ∀h ∈ H,
+
+Every fuzziness measure f m on X has the following properties:
+f1) f m(hx) = µ(h)f m(x) for ∀x ∈ X;
+f2) f m(c− ) + f m(c+ ) = 1;
+P
+f3)
+f m(hi c) = f m(c), c ∈ {c− , c+ };
+−q≤i≤p, i̸=0
+
+P
+
+f4)
+
+f m(hi x) = f m(x);
+
+−q≤i≤p, i̸=0
+
+f5) Put
+
+P
+−q≤i≤−1
+
+µ(hi ) = α,
+
+P
+
+µ(hi ) = β, we have α + β = 1.
+
+1≤i≤p
+
+It can be seen that given the values of f m(c− ), µ(h), h ∈ H, f m is completely defined
+and, hence, we call them the fuzziness parameters of the variable in question. It is interesting
+that from the given fuzziness parameters, one can define and calculate the numeric semantics
+of every word x, v(x), which can shortly be described as follows.
+Definition 3.2. A function sign: X → {−1, 1} is a mapping which is defined recursively as
+follows. For h, h′ ∈ H and c ∈ {c− , c+ }:
+1) sign(c− ) = −1, sign(c+ ) = +1;
+2) sign(hc) = −sign(c) for h being negative w.r.t c, otherwise, sign(hc) = +sign(c);
+3) sign(h′ hx) = −sign(hx) if h′ hx ̸= hx and h′ is negative w.r.t h;
+4) sign(h′ hx) = +sign(hx) if h′ hx ̸= hx and h′ is positive w.r.t h.
+Theorem 3.1. [47] For given values of the fuzziness parameter of a variable, its corresponding
+SQM v : X → [0, 1] is defined as follows
+
+ENROLLMENT FORECASTING BASED ON LINGUISTIC TIME SERIES
+
+7
+
+1) v(W ) = θ = f m(c− );
+2) v(c− ) = θ − αf m(c− ) = βf m(c− );
+3) v(c+ ) = θ + αf m(c+ ) = 1 − βf m(c+ );
+4) v(hj x) = v(x) + sign(hj x){
+
+j
+P
+
+f m(hi x) − ω(hj x)f m(hj x)}, where
+
+i=sign(j)
+
+1
+ω(hj x) = [1 + sign(hj x)sign(hp hj x)(β − α)] ∈ {α, β}.
+2
+4.
+4.1.
+
+LINGUISTIC TIME SERIES AND ITS FORECASTING MODEL
+
+Linguistic time series and its forecasting model
+
+To deal with the uncertainty of time data series forecasting, Song and Chissom in their
+studies [1, 2, 3] proposed a concept of fuzzy time series established based on a given ordinary
+data time series and a formalism to handle uncertainty represented by fuzzy sets. The main
+advantage of the fuzzy time series is the ability to handle the uncertainty in the nature
+of the time series forecasting problem. In existing approaches, however, the fuzzy sets are
+constructed based on the researchers’ intuition in the context of the data time series in
+question. There is no formal basis to connect the constructed fuzzy sets to possibly intended
+words assigned to them. Obviously, it is very useful and beneficial when one can deal
+immediately with human words based on a formal formalism with sufficient reliability, say a
+theory developed soundly based on an axiomatic way.
+As aforementioned, in this study, we deal with the so-called linguistic time series introduced to solve the time series forecasting problem which, by the fact of the matter, essentially
+involves uncertainty. Since human has capacities to deal with the uncertainty in terms of
+their own natural words, the linguistic time series and the formalism developed based on the
+HA-formalism to handle their uncertainty to solve the data time series forecasting problem
+seem to be useful and beneficial. One may find some studies using the terminology ’linguistic
+time series’ in the literature, e.g., [48, 49]. However, these studies, in nature, are essentially
+based on the formalism of either the fuzzy time series forecasting methodology [49], or fuzzy
+recurrent neural network [48]. According to our knowledge, the linguistic time series, in
+which linguistic words appear as linguistic data and are handled immediately based on a
+strict mathematical formalism without using fuzzy sets, are, for the first time, used in this
+study. For this reason, we introduce the following definition of this new concept.
+Definition 4.1. (Linguistic time series) Let X be a set of linguistic words in natural language
+of a variable X defined on the universe of discourse Ux to describe its numeric quantities.
+Then, any series L(t), t = 0, 1, 2, ..., where L(t) is a finite subset of X, is called a linguistic
+time series.
+For example, for a given time t, L(t) is a collection of words X(t)’s in X to describe
+possible data of enrollments of an university. The way to construct a linguistic time series
+for a given historical numeric data is simply as follows. Note that in existing fuzzy-set-based
+approach to the time series forecasting problem, for a given data time series, the main crucial
+task is to decompose the range of its possible numeric values into intended intervals uj ’s in
+to form a universe on which the fuzzy sets associated word-labels under consideration are
+
+8
+
+NGUYEN DUY HIEU, NGUYEN CAT HO, VU NHU LAN
+
+defined, refer to [1]. In our approach, we immediately start with the given possible words
+used to describe the values of the determined range of the given historical data.
+Definition 4.2. (The linguistic logical relationship) Suppose Xi and Xj are the linguistic
+words representing the data at the time t and t + 1, respectively. Then, there exists a
+relationship between Xi and Xj called linguistic logical relationship (LLR) and denoted by
+Xi → Xj .
+Definition 4.3. (The linguistic logical relationship group) Assume that there are LLRs
+such as
+Xi → Xj1 ,
+Xi → Xj2 ,
+...
+Xi → Xjn .
+Then, they can be grouped into a linguistic logical relationship group (LLRG) and denoted by
+Xi → Xj1 , Xj2 , ..., Xjn .
+The proposed forecasting model based on linguistic time series comprises the following
+steps:
+Step 1 . Determine the universe of discourse. Establish hedge algebras structure, choose α, β
+and choose the linguistic words according to the source data.
+Step 2. Calculate the quantifying semantics of words using equations 1) to 4) of Theorem
+3.1.
+Step 3. Mapping the quantifying semantics of words to the domain of the universe of discourse. So, we have semantic points collection.
+Step 4. ‘Semantize’ the historical data. For each specified point, the semantic of this point
+depends on the nearest semantic point.
+Step 5. Establish the linguistic logical relationships of words and group them to the linguistic
+logical relationship groups.
+Step 6. Calculate the forecasted results based on linguistic logical relationship groups and
+the principles.
+We applied this model to the data of enrollments of the University of Alabama from 1971
+to 1992. The enrollments were observed as in Table 1.
+1) Application of the proposed model to the above numeric time series
+Based on the proposed model, the procedure to solve the linguistic time series forecasting
+problem of the historical enrollments of Alabama is constructed and described as follows:
+Step 1. Let Dmin and Dmax be the minimum enrollment and the maximum enrollment,
+respectively Dmin = 13055 and Dmax = 19337.
+In [4], Chen defined the universe of discourse is [13000, 20000]. Then, he partition the
+universe of discourse to seven equal length intervals and using corresponding linguistic values:
+not many (A1 ), not too many (A2 ), many (A3 ), many many (A4 ), very many (A5 ), too many
+(A6 ), too many many (A7 ).
+In our method, we also choose the same universe of discourse with Chen. We assume
+DL , DR be the first value and the last value of the universe of discourse, respectively. Hence,
+
+ENROLLMENT FORECASTING BASED ON LINGUISTIC TIME SERIES
+
+9
+
+Table 1. Historical enrollments of University of Alabama from 1971 to 1992
+Year
+1971
+1972
+1973
+1974
+1975
+1976
+1977
+1978
+1979
+1980
+1981
+
+Actual enrollments
+13055
+13563
+13867
+14696
+15460
+15311
+15603
+15861
+16807
+16919
+16388
+
+Label
+X1
+X1
+X1
+X2
+X2
+X2
+X3
+X3
+X4
+X4
+X3
+
+Year
+1982
+1983
+1984
+1985
+1986
+1987
+1988
+1989
+1990
+1991
+1992
+
+Actual enrollments
+15433
+15497
+15145
+15163
+15984
+16859
+18150
+18970
+19328
+19337
+18876
+
+Label
+X2
+X2
+X2
+X2
+X3
+X4
+X6
+X7
+X7
+X7
+X7
+
+DL = 13000 and DR = 20000. We do not partition the universe of discourse into intervals.
+Because our model based on hedge algebras, we choose c− = S (Small ), c+ = L(Large) and
+two hedges h−1 = R (Rather ), h+1 = V (Very). Using two hedges R and V impact two
+basic elements (generators) S and L we have
+dom(Enrollments) = {V S, S, RS, M, RL, L, V L}.
+We select seven linguistic values to describe the number of enrollments: Very Small (X1 ),
+Small (X2 ), Rather Small (X3 ), Middle (X4 ), Rather Large (X5 ), Large (X6 ) and Very Large
+(X7 ). Note that every linguistic value in hedge algebras has its order. We also assign seven
+labels to seven linguistic values as above from X1 to X7 .
+Step 2. Apply equations from 1) to 4) of Theorem 3.1, we have quantity semantic of words
+as follows
+
+v(X1 ) = θ − 2θα + θα2 ;
+v(X2 ) = θ − θα;
+v(X3 ) = θ − θα2 ;
+v(X4 ) = θ;
+v(X5 ) = θ + α2 − θα2 ;
+v(X6 ) = θ − θα + α;
+v(X7 ) = θ + 2α − α2 − 2θα + θα2 .
+
+(4.1)
+(4.2)
+(4.3)
+(4.4)
+(4.5)
+(4.6)
+(4.7)
+
+Normally, the neutral values are θ = 0.5 and α = 0.5. In this study, to emphasize the
+meaning of the semantic of words, two parameters θ, α will be achieved by trial and error.
+We try to turn them with error ϵ = 0.01 around the neutral values and get the choosing
+values of θ = 0.57, α = 0.49.
+Applying above equations, we have v(X1 ) = 0.1483, v(X2 ) = 0.2907, v(X3 ) = 0.4331,
+v(X4 ) = 0.57, v(X5 ) = 0.6732, v(X6 ) = 0.7807, v(X7 ) = 0.8882. The values of v(Xi ), i =
+1, ..., 7 will change if we choose different values of θ and α.
+
+10
+
+NGUYEN DUY HIEU, NGUYEN CAT HO, VU NHU LAN
+
+Step 3. Mapping v(Xi ), i = 1, ..., 7 to the universe of discourse, we have seven real semantic
+points that similar with the mid-points of seven intervals in Chen’s model. The equation for
+mapping as follows
+vR (i) = DL + (DR − DL ) × v(Xi ).
+With the data of enrollments, DL = 13000, DR = 20000, we have seven real semantic
+points {14038, 15035, 16032, 16990, 17713, 18465, 19217}.
+Seven values above corresponding to seven linguistic values: Very Small (X1 ), Small
+(X2 ), Rather Small (X3 ), Middle (X4 ), Rather Large (X5 ), Large (X6 ) and Very Large (X7 )
+where Xi , i = 1, ..., 7 be the labels of linguistic values.
+Step 4. ‘Semantization’ of the given historical data is an assignment of a linguistic value to
+each datum of historical data of enrollments. For the actual enrollment of specific year, we
+select a linguistic value in X1 ...X7 to assign for each year depend on which semantic point
+is the nearest to the actual enrollment. For example, the enrollment of year 1971 is 13055,
+hence, the linguistic value of year 1971 is X1 because 14038 is the nearest semantic point to
+the actual enrollment. Similarly, the linguistic value corresponding to 1992 is X7 because
+19217(X7 ) is the nearest semantic point to 18876.
+Step 5. Scan from the beginning to the end of historical data with their linguistic values, we
+have the LLRs between words. If linguistic value of year k is Xi and the linguistic value of
+year k + 1 is Xj then we have the LLR: Xi → Xj . In this case, we have LLRs as follows
+
+Table 2. LLRs of the enrollments
+X1 → X1 ; X1 → X2 ; X2 → X2 ; X2 → X3 ; X3 → X2 ; X3 → X3
+X3 → X4 ; X4 → X3 ; X4 → X4 ; X4 → X6 ; X6 → X7 ; X7 → X7
+
+Establish the linguistic logical relationship groups (LLRGs) based on the LLRs that was
+observed above
+
+Table 3. Linguistic logical relationship groups
+Group LLRGs
+Shorthand
+Group 1
+
+X1 → X1 , X1 → X2
+
+X1 → X1 , X2
+
+Group 2
+
+X2 → X2 , X2 → X3
+
+X2 → X2 , X3
+
+Group 3
+
+X3 → X2 , X3 → X3 , X3 → X4
+
+X3 → X2 , X3 , X4
+
+Group 4
+
+X4 → X3 , X4 → X4 , X4 → X6
+
+X4 → X3 , X4 , X6
+
+Group 5
+
+X6 → X7
+
+X6 → X7
+
+Group 6
+
+X7 → X7
+
+X7 → X7
+
+Step 6. Calculate the forecasted data based on LLRGs and principles as follows:
+
+ENROLLMENT FORECASTING BASED ON LINGUISTIC TIME SERIES
+
+11
+
+(1) If the linguistic value of year k is Xi and there exist the LLRG: Xi → Xj1 , Xj2 , ...Xjp ,
+p ≥ 1 then the forecasted value of year k+1 is (sj1 +sj2 +...+sjp )/p, where sj1 , sj2 , ...sjp
+is the semantic point(s) of Xj1 , Xj2 , . . . Xjp , respectively.
+(2) If the linguistic value of year k is Xi and there does not exist any LLR with Xi in the
+right-hand side. Then, the forecasted value of year k + 1 is si where si is the semantic
+point of Xi .
+
+2) Simulation study to justify its performance
+We applying this constructed procedure to the numeric time series to simulate its forecasting performance at each time of the numeric time series of to the enrollments of the
+University of Alabama. Performing calculations with the proposed model and comparing
+with Song et al.’s method and Chen’s method we have results as follows.
+
+Table 4. The comparison of forecasted results
+Year
+
+Actual
+enrollments
+
+Song et al.’s
+method[2]
+
+Chen’s
+method[4]
+
+Proposed
+method
+
+1971
+1972
+1973
+1974
+1975
+1976
+1977
+1978
+1979
+1980
+1981
+1982
+1983
+1984
+1985
+1986
+1987
+1988
+1989
+1990
+1991
+1992
+
+13055
+13563
+13867
+14696
+15460
+15311
+15603
+15861
+16807
+16919
+16388
+15433
+15497
+15145
+15163
+15984
+16859
+18150
+18970
+19328
+19337
+18876
+
+14000
+14000
+14000
+15500
+16000
+16000
+16000
+16000
+16813
+16813
+16709
+16000
+16000
+16000
+16000
+16000
+16813
+19000
+19000
+19000
+-
+
+14000
+14000
+14000
+15500
+16000
+16000
+16000
+16000
+16833
+16833
+16833
+16000
+16000
+16000
+16000
+16000
+16833
+19000
+19000
+19000
+19000
+
+14537
+14537
+14537
+15534
+15534
+15534
+16019
+16019
+17162
+17162
+16019
+15534
+15534
+15534
+15514
+16019
+17162
+19217
+19217
+19217
+19217
+
+412.499
+
+407.507
+
+262.326
+
+Mean squared error (MSE)
+
+12
+
+NGUYEN DUY HIEU, NGUYEN CAT HO, VU NHU LAN
+
+The MSE (mean squared error) measure is defined as follows
+M SE =
+
+1 X
+(Fi − Ai )2
+N
+i
+
+where Fi and Ai are the forecasted value and actual value of year i, respectively. N is the
+total forecasted years. As we can see in Table 4, our proposed forecasting model has better
+mean squared errors (MSE) of 262.326 than Song et al.’s and Chen’s are 412.499 and 407.507,
+respectively.
+4.2.
+
+Linguistic time series based on variations of historical enrollments
+
+In [6], Hwang et al. introduce a time-variant fuzzy time series forecasting model using
+variations of historical data. His study suggests that, how and in which way one can model
+and calculate the variations of the data is important. In this section, we will show that, based
+on hedge algebras, linguistic time series are very useful to linguistically describe and computationally handle the variations of historical data to solve a forecasting problem. Historical
+enrolments of the University of Alabama from year 1972 to 1992 and their variations given
+in Table 5 are used in [6], and also in this study to illustrate our forecasting process based
+on linguistic time series and to compare its performance with the one proposed in the study
+[6], where the range of the variable, denoted by ν, is defined in the interval [−1000; +1400].
+
+Table 5. Variations of historical enrollments data
+Year
+1971
+1972
+1973
+1974
+1975
+1976
+1977
+1978
+1979
+1980
+1981
+
+Enrollments
+13055
+13563
+13867
+14696
+15460
+15311
+15603
+15861
+16807
+16919
+16388
+
+Variations
+
+Label
+
++508
++304
++829
++764
+−149
++292
++258
++946
++112
+−531
+
+X5
+X4
+X6
+X6
+X3
+X4
+X4
+X6
+X3
+X1
+
+Year
+1982
+1983
+1984
+1985
+1986
+1987
+1988
+1989
+1990
+1991
+1992
+
+Enrollments
+15433
+15497
+15145
+15163
+15984
+16859
+18150
+18970
+19328
+19337
+18876
+
+Variations
+−955
++64
+−352
++18
++821
++875
++1291
++820
++358
++9
+−461
+
+Label
+X1
+X3
+X2
+X3
+X6
+X6
+X7
+X6
+X4
+X3
+X2
+
+For the method proposed by Hwang et al. [6], the above variation range is partitioned
+into equal intervals of the same length 400. Then, they calculate the forecasted results
+based on their proposed time-variant fuzzy time series forecasting model. In our method,
+based on hedge algebras, we choose c− = d(decreasing), c+ = i(increasing) and two hedges
+h−1 = L(Little), h+1 = V (V ery). Hence, the word-domain of the variable ν can be described
+by the following word-set of seven linguistic values:
+LDOM (ν) = {V decre, decre, L decre, med, L incre, incre, V incre},
+
+ENROLLMENT FORECASTING BASED ON LINGUISTIC TIME SERIES
+
+13
+
+where the notations in the above braces are defined and denoted by Xi , for short, as follows:
+V decre : Very decreasing (X1 ), decre : decreasing (X2 ), L decre : Little decreasing (X3 ),
+med : medium (X4 ), L incre : Little increasing (X5 ), incre : increasing (X6 ), V incre :
+Very increasing (X7 ). Then, we can transform the numeric time-variant data given in the
+column “Variations” into a linguistic time series given in the column “Label”, which is very
+comprehensive in terms of human words and is listed as follows:
+L incre, med, incre, incre, L decre, med, med, incre, L decre, V decre, V decre, L decre,
+decre, L decre, incre, incre, V incre, incre, med, L decre, decre
+When the two independent fuzziness parameter values of the linguistic variable ν, θ =
+0.55 and α = 0.52, are determined by trial and error, we can calculate the quantitative
+semantic values of the words of LDOM (ν) occurring in the above linguistic time series,
+using equations (4.1) to (4.7) in Section 4.1, and transform the words in the above worddomain, LDOM (ν), into their corresponding numeric values in {0.1267; 0.264; 0.4013; 0.55;
+0.6717; 0.784; 0.8963}, which is a subset of the normalized numeric universe, [−1000; +1400],
+of ν. Thus, we must transform these numeric values in [0, 1] into the corresponding values
+in [−1000; +1400], and obtain
+{−696; −366; −37; +320; +612; +882; +1151}.
+We semantize the given historical data and establish the linguistic logical relationships
+(LLRs) represented in Table 6, using forecasting model in Section 4.1.
+
+Table 6. LLRs between variations
+X1 → X1 ; X1 → X3 ; X2 → X3 ; X3 → X1 ; X3 → X2 ; X3 → X4
+X3 → X6 ; X4 → X3 ; X4 → X4 ; X4 → X6 ; X5 → X4 ; X6 → X3
+X6 → X4 ; X6 → X6 ; X6 → X7 ; X7 → X6 ;
+
+Grouping the obtained linguistic logical relationships into groups, we have the following
+LLRGs:
+
+Table 7. LLRGs between variations
+Group
+
+LLRGs
+
+Shorthand
+
+Group 1
+
+X1 → X1 , X1 → X3
+
+X1 → X1 , X3
+
+Group 2
+
+X2 → X3
+
+X2 → X3
+
+Group 3
+
+X3 → X1 , X3 → X3 , X3 → X4 , X3 → X6
+
+X3 → X1 , X3 , X4 , X6
+
+Group 4
+
+X4 → X3 , X4 → X4 , X4 → X6
+
+X4 → X3 , X4 , X6
+
+Group 5
+
+X5 → X4
+
+X5 → X4
+
+Group 6
+
+X6 → X3 , X6 → X4 , X6 → X6 , X6 → X7
+
+X6 → X3 , X4 , X6 , X7
+
+Group 7
+
+X7 → X6
+
+X7 → X6
+
+14
+
+NGUYEN DUY HIEU, NGUYEN CAT HO, VU NHU LAN
+
+We apply the proposed model and use above LLRGs, to solve the benchmark problem
+of the historical enrollments of Alabama. The obtained forecasting results of the method
+are represented in Table 8, whose performance measure MAPE (mean absolute percentage
+error) computed as follows:
+
+M AP E =
+
+100% X (Fi − Ai )
+,
+N
+Ai
+i
+
+where Fi and Ai are the forecasted value and actual value of year i, respectively and N is
+the total number of the forecasted years.
+
+Table 8. Forecasted results of linguistic time series based on variations
+Year
+1971
+1972
+1973
+1974
+1975
+1976
+1977
+1978
+1979
+1980
+1981
+1982
+1983
+1984
+1985
+1986
+1987
+1988
+1989
+1990
+1991
+1992
+
+Actual enrollment
+13055
+13563
+13867
+14696
+15460
+15311
+15603
+15861
+16807
+16919
+16388
+15433
+15497
+15145
+15163
+15984
+16859
+18150
+18970
+19328
+19337
+18876
+MSE and MAPE
+
+Variations
+
+Forecasting results
+
+Errors
+
++ 508
++ 304
++ 829
++ 764
+- 149
++ 292
++ 258
++ 946
++ 112
+- 531
+- 955
++ 64
+- 352
++ 18
++ 821
++ 875
++ 1291
++ 820
++ 358
++9
+- 461
+
+133 75
+13951
+14446
+15275
+15495
+15699
+15991
+16440
+16842
+16552
+16021
+15468
+15460
+15180
+15742
+16563
+17741
+18729
+19358
+19363
+19300
+
+1.39%
+0.61%
+1.70%
+1.20%
+1.20%
+0.62%
+0.82%
+2.18%
+0.46%
+1.00%
+3.81%
+0.19%
+2.08%
+0.11%
+1.51%
+1.76%
+2.25%
+1.27%
+0.16%
+0.13%
+2.25%
+
+65.029
+
+1.27%
+
+Analyzing these results, we see that the errors vary from 0.11% to 3.81% and the average
+of errors is 1.27%, which is much better than the results of the method examined in [6],
+whose forecasting errors vary from 2.79% to 3.08%.
+
+15
+
+ENROLLMENT FORECASTING BASED ON LINGUISTIC TIME SERIES
+
+Table 9. The comparisons of MAPE between methods
+Methods
+
+Song and
+Chissom [2]
+
+Song and
+Chissom (w = 4)
+
+Chen
+
+Sullivan and
+Woodall [5]
+
+Hwang
+(w = 4)[6]
+
+Proposed
+
+MAPE
+
+3.2%
+
+4.37%
+
+3.22%
+
+2.6%
+
+3.12%
+
+1.27%
+
+Table 9 represents a comparison between the performance of the proposed method with
+the ones of some other forecasting methods discussed in [6]. It shows also that the performance of the proposed method, in general, is noticeably better than the one of the fuzzy
+time series forecasting methods under consideration in solving the enrollment forecasting
+problem.
+5.
+
+CONCLUSIONS
+
+In this study, we propose a new forecasting model based on the so-called linguistic time
+series, in which the linguistic words are considered as elements of a hedge algebra that models
+the respective word-domain of the linguistic variable. A distinguished feature of our method
+is to deal immediately with linguistic words instead of with fuzzy sets, whose associated
+words are considered merely linguistic labels. Because hedge algebras are mathematical
+models of the word-domains of linguistic variables, similar as the theory of the real numbers
+modeling the domains of their counterpart real variables, the formalism to handle linguistic
+time series can be developed based on the hedge algebra formalism instead of fuzzy one to
+deal with vague data.
+In fuzzy formalism, the elementary mathematical objects are fuzzy sets. Hence, the performance of fuzzy time series forecasting method depends strongly on two main factors. The
+first factor is how these fuzzy sets can be soundly constructed based on the developers’ subjective intuition to represent the semantics of their associated linguistic labels. The second
+one is which method to compute the representative (single) value can properly represent
+the area of its fuzzy set. It is, in general, a difficult problem in the fuzzy set framework.
+Moreover, words have their own objective semantics commonly understood between a human
+user domain community and their numeric semantics is, more or less, able commonly defined
+between domain experts.
+Hedge algebras and their quantification theory are developed in an axiomatic way, whose
+axioms are justified to soundly model the semantic structures of word-domains of variables.
+Once the fuzziness parameter values of a variable are “properly” determined, the numeric
+semantics of the variable words are uniquely computed. Thus, human experts may focus
+their effort on proper determining only a few of these fuzziness parameter values. When
+they are properly determined, the numeric semantics of all words of the variable of a given
+time series forecasting problem can be exactly computed. Also, human words are very
+comprehensive, and easily, commonly understood between human users/experts of a human
+forecasting domain community. They can easily use their vocabulary to describe the possible
+variations of a time data series. This situation suggests us to introduce a concept of linguistic
+time (variant) time series model to solve time data series forecasting problems.
+The time series forecasting method proposed in this study allows to translate a given
+
+16
+
+NGUYEN DUY HIEU, NGUYEN CAT HO, VU NHU LAN
+
+time variant data series into a respective linguistic time variant series, then, to determine
+linguistic logical relationships (LLRs) in terms of human linguistic rules, which are very
+informative and comprehensive for human community users. The prediction values can
+be easily computed in the formalism of the quantification theory of the specified hedge
+algebra. The experiment performed in Section 4 shows that the performance of the proposed
+forecasting method is noticeably better than the counterpart methods under consideration,
+including the one examined in [6].
+As our future work, we intend to apply the proposed model to solve more complex time
+data series and enhance the proposed model. We can also apply the proposed model to the
+other data sets for illustrating its advantage.
+REFERENCES
+[1] Q. Song and B. S. Chissom, “Fuzzy time series and its models,” Fuzzy Sets Syst., vol.
+54, pp. 269–277, 1993.
+[2] Q. Song and B. S. Chissom, “Forecasting enrollments with fuzzy time series - part 1,”
+Fuzzy Sets Syst., vol. 54, pp. 1–9, 1993.
+[3] Q. Song and B. S. Chissom, “Forecasting enrollments with fuzzy time series - part 2,”
+Fuzzy Sets Syst., vol. 62, pp. 1–8, 1994.
+[4] S. M. Chen, “Forecasting enrollments based on fuzzy time series,” Fuzzy Sets Syst., vol.
+81, pp. 311–319, 1996.
+[5] J. Sullivan and W. H. Woodall, “A comparison of fuzzy forecasting and Markov modeling,” Fuzzy Sets Syst., vol. 64, pp. 279–293, 1994.
+[6] J. R. Hwang, S. M. Chen, and C. H. Lee, “Handling forecasting problems using fuzzy
+time series,” Fuzzy Sets Syst., vol. 100, pp. 217–228, 1998.
+[7] S. M. Chen, “Forecasting enrollments based on high-order fuzzy time series,” Cybern.
+Syst., vol. 33, no. 1, pp. 1–16, 2002.
+[8] S. R. Singh, “A computational method of forecasting based on high-order fuzzy time
+series,” Expert Syst. Appl., vol. 36, no. 7, pp. 10551–10559, 2009.
+[9] K. K. Gupta and S. Kumar, “A novel high-order fuzzy time series forecasting method
+based on probabilistic fuzzy sets,” Granul. Comput., no. 4, pp. 699–713, 2019.
+https://doi.org/10.1007/s41066-019-00168-4
+[10] S. S. Gangwar and S. Kumar, “Partitions based computational method for high-order
+fuzzy time series forecasting,” Expert Syst. Appl., vol. 39, no. 15, pp. 12158–12164, 2012.
+[11] N. V. Tinh and N. C. Dieu, “A new hybrid fuzzy time series forecasting model based on
+combining fuzzy c-means clustering and particle swam optimization,” J. Comput. Sci.
+Cybern., vol. 35, no. 3, pp. 267–292, 2019.
+
+ENROLLMENT FORECASTING BASED ON LINGUISTIC TIME SERIES
+
+17
+
+[12] L. W. Lee, S. M. Chen, Y. H. Leu, and L. H. Wang, “Handling forecasting problems
+based on two-factors high-order fuzzy time series,” in IEEE Trans. Fuzzy Syst., vol. 14,
+no. 3, pp. 468–477, June 2006.
+[13] S. M. Chen and S. W. Chen, “Fuzzy forecasting based on two-factors second-order
+fuzzy-trend logical relationship groups and the probabilities of trends of fuzzy logical
+relationships,” in IEEE Trans. Cybern., vol. 45, no. 3, pp. 405–417, 2015.
+[14] W. Zhang, S. Zhang, S. Zhang, D. Yu, and N. N. Huang, “A multi-factor and highorder stock forecast model based on Type-2 FTS using cuckoo search and self-adaptive
+harmony search,” Neurocomputing, vol. 240, pp. 13–24, 2017.
+[15] M. Khashei, S. R. Hejazi, and M. Bijari, “A new hybrid artificial neural networks and
+fuzzy regression model for time series forecasting,” Fuzzy Sets Syst., vol. 159, no. 7, pp.
+769–786, 2008.
+[16] E. Egrioglu, C. H. Aladag, U. Yolcu, and A. Z. Dalar, “A hybrid high order fuzzy time
+series forecasting approach based on PSO and ANNs methods,” Am. J. Intell. Syst.,
+vol. 6, no. 1, p. 8, 2016.
+[17] S. M. Chen and N. Y. Chung, “Forecasting Enrollments of Students by Using Fuzzy
+Time Series and Genetic Algorithms,” Inf. Manag. Sci., vol. 17, no. 3, pp. 1–17, 2006.
+[18] S. M. Chen and B. D. H. Phuong, “Fuzzy time series forecasting based on optimal
+partitions of intervals and optimal weighting vectors,” Knowledge-Based Syst., vol. 118,
+pp. 204–216, 2017.
+[19] S. M. Chen and N. Y. Chung, “Forecasting enrollments using high-order fuzzy time
+series and genetic algorithms,” Int. J. Intell. Syst., vol. 21, pp. 485–501, 2006.
+[20] L. W. Lee, L. H. Wang, and S. M. Chen, “Temperature prediction and TAIFEX forecasting based on fuzzy logical relationships and genetic algorithms,” Expert Syst. Appl.,
+vol. 33, p. 12, 2007.
+[21] E. Egrioglu, “A new time-invariant fuzzy time series forecasting method based on genetic
+algorithm,” Adv. Fuzzy Syst., vol. 2012, 2012. https://doi.org/10.1155/2012/785709
+[22] Q. Cai, D. Zhang, B. Wua, and S. C. H. Leung, “A novel stock forecasting model
+based on fuzzy time series and genetic algorithm,” Procedia Comput. Sci., vol. 18, pp.
+1155–1162, 2013.
+[23] C. H. Aladag, U. Yolcu, E. Egrioglu, and E. Bas, “Fuzzy lagged variable selection in
+fuzzy time series with genetic algorithms,” Appl. Soft Comput. J., vol. 22, pp. 465–473,
+2014.
+[24] I. H. Kuo, S. J. Horng, T. W. Kao, T. L. Lin, C. L. Lee, and Y. Pan, “An improved
+method for forecasting enrollments based on fuzzy time series and particle swarm optimization,” Expert Systems with Applications, vol. 36, no. 3, Part 2, pp. 6108–6117,
+April 2009.
+
+18
+
+NGUYEN DUY HIEU, NGUYEN CAT HO, VU NHU LAN
+
+[25] C. H. Aladag, U. Yolcu, E. Egrioglu, and A. Z. Dalar, “A new time invariant fuzzy time
+series forecasting method based on particle swarm optimization,” Appl. Soft Comput.
+J., vol. 12, no. 10, pp. 3291–3299, 2012.
+[26] P. Singh and B. Borah, “Forecasting stock index price based on M-factors fuzzy time
+series and particle swarm optimization,” Int. J. Approx. Reason., vol. 55, no. 3, pp.
+812–833, 2014.
+[27] C. H. Cheng, G. W. Cheng, and J. W. Wang, “Multi-attribute fuzzy time series method
+based on fuzzy clustering,” Expert Systems with Applications, vol. 34, no. 2, pp. 1235–
+1242, 2008.
+[28] W. Deng, G. Wang, X. Zhang, J. Xu, and G. Li, “A multi-granularity combined prediction model based on fuzzy trend forecasting and particle swarm techniques,” Neurocomputing, vol. 173, pp. 1671–1682, 2016.
+[29] H. Wu, H. Long, and J. Jiang, “Handling forecasting problems based on fuzzy time
+series model and model error learning,” Appl. Soft Comput., vol. 78, pp. 109–118, 2019.
+[30] N. C. Ho and W. Wechler, “Hedge Algebras: An algebraic approach to structure of sets
+of linguistic truth values,” Fuzzy Sets Syst., vol. 35, pp. 281–293, 1990.
+[31] H. L. Bui, T. A. Le, and V. B. Bui, “Explicit formula of hedge-algebras-based fuzzy
+controller and applications in structural vibration control,” Appl. Soft Comput., vol. 60,
+pp. 150–166, 2017.
+[32] H. L. Bui, N. L. Vu, C. H. Nguyen, and C.-H. Nguyen, “General design method of
+hedge-algebras-based fuzzy controllers and an application for structural active control,”
+Appl. Intell., vol. 43, pp. 251–275, 2015. https://doi.org/10.1007/s10489-014-0638-6
+[33] D. T. Tran, V. B. Bui, T. A. Le, and H. L Bui, “Vibration control of a structure
+using sliding-mode hedge-algebras-based controller,” Soft Comput., vol. 23, no. 6, pp.
+2047–2059, 2017.
+[34] C. H. Nguyen, N. L. Vu, and D. A. Nguyen, “Fuzzy controller using hedge algebra
+based semantics of vague linguistic terms,” in Fuzzy Control Systems, D. Vukadinovic,
+Ed. Nova Science Publishers, Inc., 2011.
+[35] D. Vukadinovic, M. Basic, C. H. Nguyen, N. L. Vu, and T. D. Nguyen,
+“Hedge-algebra-based voltage controller for a self-excited induction generator,” Control Engineering Practice, vol. 30, pp. 78-90, September 2014.
+https://doi.org/10.1016/j.conengprac.2014.05.006
+[36] N. C. Ho, V. N. Lan, and L. X. Viet, “Optimal hedge-algebras-based controller:
+Design and application,” Fuzzy Sets Syst., vol. 159, no. 8, pp. 968–989, 2008.
+https://doi.org/10.1016/j.fss.2007.11.001
+[37] C. H. Nguyen, T. S. Tran, and D. P. Pham, “Modeling of a semantics core of linguistic
+terms based on an extension of hedge algebra semantics and its application,” KnowledgeBased Systems, vol. 67, pp. 244–262, 2014. https://doi.org/10.1016/j.knosys.2014.04.047
+
+ENROLLMENT FORECASTING BASED ON LINGUISTIC TIME SERIES
+
+19
+
+[38] C. H. Nguyen, V. T. Hoang, and V. L. Nguyen, “A discussion on interpretability of linguistic rule based systems and its application to solve regression problems,” KnowledgeBased Systems, vol. 88, pp. 107–133, 2015. https://doi.org/10.1016/j.knosys.2015.08.002
+[39] N. C. Ho and J. M. Alonso, “Looking for a real-world-semantics-based approach to
+the interpretability of fuzzy systems,” in 2017 IEEE International Conference on Fuzzy
+Systems (FUZZ-IEEE), Naples, 2017, pp. 1–6.
+[40] N. V. Han and P. C. Vinh, “Modeling with words based on hedge algebra,” in ICCASA ICTCC 2018, vol. 266. Springer, Cham, 2018. DOI https://doi.org/10.1007/978-3-03006152-4 18
+[41] H. H. Ngo, C. H. Nguyen, and V. Q. Nguyen, “Multichannel image contrast enhancement
+based on linguistic rule-based intensificators,” Appl. Soft Comput., vol. 76, pp. 744–763,
+2019.
+[42] N. D. Hieu, V. N. Lan, and N. C. Ho, “Fuzzy time series forecasting based on semantics,”
+in FAIR Conference, pp. 232–243, 2015. DOI: 10.15625/vap.2015.000156
+[43] N. D. Hieu, N. V. Tinh, and V. N. Lan, “A new method to forecast using fuzzy time series
+based on linguistic semantics,” in Fundamental and Applied Information Technology
+(FAIR), Can Tho, Viet Nam, 2016, pp. 435–443. DOI: 10.15625/vap.2016.00053
+[44] N. C. Ho, N. C. Dieu, and V. N. Lan, “The application of hedge algebras in fuzzy time
+series forecasting,” J. Sci. Technol., vol. 54, no. 2, pp. 161–177, 2016.
+[45] H. Tung, N. D. Thuan, and V. M. Loc, “Method of forecasting time series based on hedge
+algebras based fuzzy time series,” in Fundamental and Applied Information Technology
+(FAIR), Can Tho, Viet Nam, 2016, pp. 610–618. DOI: 10.15625/vap.2016.00075
+[46] L. A. Zadeh, “Fuzzy sets,” Inf. Control, vol. 8, pp. 338–353, 1965.
+[47] N. C. Ho and N. V. Long, “Fuzziness measure on complete hedge algebras and quantifying semantics of terms in linear hedge algebras,” Fuzzy Sets Syst., vol. 158, pp. 452–471,
+2007.
+[48] R. A. Aliev, B. Fazlollahi, R. R. Aliev, and B. Guirimov, “Linguistic time series forecasting using fuzzy recurrent neural network,” Soft Comput., vol. 12, no. 2, pp. 183–190,
+2008.
+[49] R. Efendi, Z. Ismail, and M. M. Deris, “A new linguistic out-sample approach of fuzzy
+time series for daily forecasting of Malaysian electricity load demand,” Appl. Soft Comput., vol. 28, pp. 422–430, 2015.
+
+Received on September 05, 2019
+Revised on January 07, 2020
+
+
