@@ -50,36 +50,36 @@ pip install -e ".[dev]"            # cài đặt cả pytest cho phát triển
 
 ```bash
 # Tất cả bảng kết quả (Table 4, 8, 9)
-python main.py paper
+python3 main.py paper
 
 # Chỉ Table 4 — Enrollment forecasting
-python main.py paper --table 4
+python3 main.py paper --table 4
 
 # Chỉ Table 8 — Variation-series forecasting
-python main.py paper --table 8
+python3 main.py paper --table 8
 
 # Chỉ Table 9 — So sánh với Chen và Song & Chissom
-python main.py paper --table 9
+python3 main.py paper --table 9
 ```
 
 ### Chạy trên dataset tuỳ chọn
 
 ```bash
 # Dataset bundled
-python main.py run --dataset alabama
-python main.py run --dataset taifex_1998
+python3 main.py run --dataset alabama
+python3 main.py run --dataset taifex_1998
 
 # Từ file CSV (cột Close, universe [6000, 12000])
-python main.py run --csv datasets/TAIEX.csv --column Close --lb 6000 --ub 12000
+python3 main.py run --csv datasets/TAIEX.csv --column Close --lb 6000 --ub 12000
 
 # Tham số tùy chỉnh
-python main.py run --dataset alabama --theta 0.55 --alpha 0.52 --order 2
+python3 main.py run --dataset alabama --theta 0.55 --alpha 0.52 --order 2
 
 # Mô hình variation series
-python main.py run --dataset alabama --variations --lb-var -1000 --ub-var 1400
+python3 main.py run --dataset alabama --variations --lb-var -1000 --ub-var 1400
 
 # Hiển thị danh sách dự báo
-python main.py run --dataset alabama --show
+python3 main.py run --dataset alabama --show
 ```
 
 ### Trong Python
@@ -124,7 +124,7 @@ print(output.forecast_table())
 ## Chạy tests
 
 ```bash
-python -m pytest tests/ -v
+python3 -m pytest tests/ -v
 ```
 
 Kết quả kỳ vọng: **75/75 passed**.
@@ -177,7 +177,7 @@ pyLTS/
 
 ## Kết quả thực nghiệm
 
-Tái hiện từ bài báo 2020 (Alabama Enrollment, 1971–1992):
+### LTS (2020) — Alabama Enrollment
 
 | Mô hình | MSE | MAPE |
 |---|---|---|
@@ -185,7 +185,125 @@ Tái hiện từ bài báo 2020 (Alabama Enrollment, 1971–1992):
 | Chen [1996] | 407,521 | 3.11% |
 | Song & Chissom [1993] | 806,087 | 3.76% |
 
-> Lưu ý: Paper báo cáo MSE theo đơn vị ÷1000 (262.326 = 262,326 actual). Semantic points khớp chính xác với Table 1 của bài báo: `{V−: 14,038 · − : 15,035 · L−: 16,032 · W: 16,990 · L+: 17,713 · +: 18,465 · V+: 19,217}`.
+> Semantic points: `{V−: 14,038 · −: 15,035 · L−: 16,032 · W: 16,990 · L+: 17,713 · +: 18,465 · V+: 19,217}`.
+
+---
+
+## Mô hình mở rộng
+
+### HO-LTS (2021) — High-Order LTS
+
+Mô hình bậc cao (λ=1..9) với fallback rule cải tiến: khi không tìm thấy LLR group cho một LHS, thay vì lấy từ cuối, **HO-LTS lấy trung bình semantic points của TẤT CẢ từ trong LHS**.
+
+**Kết quả tốt nhất (Alabama, λ=9, 65 từ):** MSE ≈ 283, AFE ≈ 0.07%.
+
+```python
+from lts import HOLTSModel, DataLoader
+
+ds = DataLoader.bundled("alabama")
+
+# Bậc 2, 17 từ
+m = HOLTSModel(HOLTSModel.params_for_word_count(17), order=2, specificity=2)
+m.fit(ds.values, ds.lb, ds.ub)
+print(f"HO-LTS order=2: {m.predict()[:3]}")
+
+# Bậc 9, 65 từ (tốt nhất theo bài báo)
+m9 = HOLTSModel(HOLTSModel.params_for_word_count(65), order=9, specificity=4)
+m9.fit(ds.values, ds.lb, ds.ub)
+```
+
+```bash
+python3 main.py run --dataset alabama --model ho-lts --order 9 --specificity 4
+
+# Tái hiện bảng HO-LTS (tất cả orders × word counts)
+python3 main.py paper --table holts
+```
+
+**Tham số từ bài báo:**
+
+| Số từ (code) | specificity | theta | alpha |
+|---|---|---|---|
+| 7 | 1 | 0.437 | 0.511 |
+| 15 | 2 | 0.527 | 0.412 |
+| 31 | 3 | 0.65 | 0.35 |
+| 63 | 4 | 0.65 | 0.35 |
+
+> Lưu ý: Bài báo dùng 9/17/33/65 từ với cấu trúc HA hơi khác; code này dùng 7/15/31/63 từ nhưng cùng params.
+
+---
+
+### LTS-PSO (2022) — PSO Parameter Optimization
+
+PSO tối ưu `(theta, alpha)` để minimize MSE trên training data. Công thức dự báo được cải tiến:
+
+```
+Có rule:    forecast = 0.5 × (s_lhs_last + mean(s_RHS))
+Không rule: forecast = s_lhs_last
+```
+
+**Kết quả (Alabama):** MSE ≈ 22,403 (theta=0.4789, alpha=0.608).
+
+```python
+from lts import LTSPSOModel, HAParams, DataLoader
+from lts.optimization.pso import PSOConfig
+
+ds = DataLoader.bundled("alabama")
+
+# Dự báo với params cố định (không PSO)
+m = LTSPSOModel(HAParams(theta=0.4789, alpha=0.608), specificity=2)
+m.fit(ds.values, ds.lb, ds.ub)
+
+# Tối ưu PSO (paper: N=300, G_max=1000, chạy 3 lần)
+m_opt = LTSPSOModel(HAParams(theta=0.5, alpha=0.5), specificity=2)
+cfg = PSOConfig(n_particles=300, max_iter=1000, omega=0.4, c1=2.0, c2=2.0,
+                bounds=[(0.3, 0.7), (0.3, 0.7)])
+best_params = m_opt.fit_optimize(ds.values, ds.lb, ds.ub, pso_config=cfg, n_runs=3)
+print(f"Best: theta={best_params.theta:.4f}, alpha={best_params.alpha:.4f}")
+```
+
+```bash
+python3 main.py run --dataset alabama --model lts-pso --optimize
+
+# Tái hiện bảng LTS-PSO (chạy PSO đầy đủ — vài phút)
+python3 main.py paper --table pso
+```
+
+---
+
+### CO-LTS (2023) — Co-Optimization
+
+PSO lồng nhau đồng tối ưu cả tham số HA lẫn tập từ vựng:
+- **Outer PSO**: tối ưu `(theta, alpha)` — N=20 particles, 30 vòng.
+- **Inner PSO (UWO)**: tối ưu chọn `d_w` từ từ W_all — M=30 particles, 100 vòng.
+
+**Kết quả Alabama (5 lần chạy, lấy best):**
+
+| Variant | k_max | d_w | MSE (paper) |
+|---|---|---|---|
+| COLTS3 | 3 | 7 | ≈ 47,628 |
+| COLTS4 | 4 | 14 | ≈ 16,344 |
+| COLTS5 | 5 | 16 | ≈ 6,332 |
+
+```python
+from lts import COLTSModel, COLTSConfig, DataLoader
+
+ds = DataLoader.bundled("alabama")
+
+# COLTS5 — kết quả tốt nhất
+cfg = COLTSConfig.colts5()   # k_max=5, d_w=16, n_runs=5
+m = COLTSModel(cfg)
+m.fit(ds.values, ds.lb, ds.ub)
+print(f"Best params: {m.best_params}")
+print(f"Best words:  {m.best_words}")
+print(f"Best MSE:    {m.best_mse:.0f}")
+```
+
+```bash
+python3 main.py run --dataset alabama --model co-lts --kmax 5 --dw 16
+
+# Tái hiện bảng CO-LTS (chạy nested PSO — vài phút)
+python3 main.py paper --table colts
+```
 
 ---
 
@@ -209,21 +327,21 @@ class MyNewModel(BaseForecaster):
         ...
 ```
 
-### Tối ưu tham số (PSO/GA)
+### PSO optimizer dùng chung
 
-`HAParams` là frozen dataclass → hashable, dùng trực tiếp làm objective function:
+`lts/optimization/pso.py` là generic PSO có thể dùng cho bất kỳ objective function nào:
 
 ```python
-from lts import HAParams, LTSModel, ForecastMetrics
+from lts.optimization.pso import PSO, PSOConfig
 
-def objective(theta: float, alpha: float, data, lb, ub) -> float:
-    params = HAParams(theta=theta, alpha=alpha)
-    m = LTSModel(params, specificity=1, order=1, use_repeat=False)
-    m.fit(data, lb, ub)
-    mets = ForecastMetrics.compute(data[1:], m.predict())
-    return mets.mse  # minimize MSE
+def my_objective(position: list[float]) -> float:
+    theta, alpha = position
+    # ... fit model, compute MSE ...
+    return mse
 
-# Kết nối với thư viện PSO/GA tuỳ chọn (pyswarms, DEAP, scipy, ...)
+cfg = PSOConfig(n_particles=50, max_iter=200, omega=0.4, c1=2.0, c2=2.0,
+                bounds=[(0.3, 0.7), (0.3, 0.7)])
+best_pos, best_val = PSO(my_objective, cfg).run()
 ```
 
 ### Mở rộng từ vựng
@@ -233,8 +351,8 @@ def objective(theta: float, alpha: float, data, lb, ub) -> float:
 params = HAParams(theta=0.57, alpha=0.49)
 model = LTSModel(params, specificity=1)    # V-, -, L-, W, L+, +, V+
 
-# 15 từ (specificity=2)
-model = LTSModel(params, specificity=2)    # thêm VL-, LL-, LV-, VV-, ...
+# 17 từ (specificity=2)
+model = LTSModel(params, specificity=2)
 
 # Từ vựng tường minh
 model = LTSModel(params, words=["V-", "-", "W", "+", "V+"])
@@ -246,7 +364,7 @@ model = LTSModel(params, words=["V-", "-", "W", "+", "V+"])
 from lts import DataLoader
 
 # Từ CSV
-dataset = DataLoader.from_csv("datasets/TAIEX.csv", column="Close", lb=6000, ub=12000)
+dataset = DataLoader.from_csv("path/to/data.csv", column="Close", lb=6000, ub=12000)
 
 # Từ list
 dataset = DataLoader.from_list([100, 105, 98, ...], lb=90, ub=120)
@@ -281,23 +399,37 @@ v(Lx) = v(x) + sign(Lx) · fm(Lx) · (1 − α)
 v(Vx) = v(x) + sign(Vx) · fm(Vx) · (1 − β)
 ```
 
-Công thức closed-form cho 7 từ được implement tại [`lts/core/sqm_formulas.py`](lts/core/sqm_formulas.py).
+Công thức closed-form cho 7 từ: [`lts/core/sqm_formulas.py`](lts/core/sqm_formulas.py).
 
 ---
 
 ## Trích dẫn
-
-Nếu dùng pyLTS trong nghiên cứu, vui lòng trích dẫn:
 
 ```bibtex
 @article{hieu2020enrollment,
   title   = {Enrollment Forecasting Based on Linguistic Time Series},
   author  = {Nguyen Duy Hieu and Nguyen Cat Ho and Vu Nhu Lan},
   journal = {Journal of Computer Science and Cybernetics},
-  volume  = {36},
-  number  = {2},
-  year    = {2020},
+  volume  = {36}, number  = {2}, year = {2020},
   doi     = {10.15625/1813-9663/36/2/14396}
+}
+
+@article{hieu2021holts,
+  title  = {High-Order Linguistic Time Series Forecasting Based on Hedge Algebras},
+  author = {Nguyen Duy Hieu},
+  year   = {2021}
+}
+
+@article{hieu2022ltspso,
+  title  = {Linguistic Time Series Forecasting Based on Hedge Algebras and PSO},
+  author = {Nguyen Duy Hieu},
+  year   = {2022}
+}
+
+@article{hieu2023colts,
+  title  = {Co-Optimization of Hedge Algebra Parameters and Word-Set Selection for LTS},
+  author = {Nguyen Duy Hieu},
+  year   = {2023}
 }
 ```
 
