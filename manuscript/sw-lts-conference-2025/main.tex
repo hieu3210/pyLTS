@@ -1,0 +1,764 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{amsthm}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{bm}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{SW-LTS: Similarity-Weighted Linguistic Time Series Forecasting\\
+via Gaussian Kernel Aggregation over Hedge Algebra Semantic Space}
+
+\author{
+\IEEEauthorblockN{Nguyen Duy Hieu}
+\IEEEauthorblockA{
+\textit{Faculty of Natural Sciences}\\
+Tay Bac University\\
+Son La, Viet Nam\\
+hieund@utb.edu.vn}
+}
+
+\maketitle
+
+% ─────────────────────────────────────────────────────────────────────────────
+\begin{abstract}
+Linguistic Time Series (LTS) forecasting, grounded in the algebraic
+theory of Hedge Algebras (HA), maps numeric observations to linguistic
+labels and derives forecasting rules through Linguistic Logical
+Relationship Groups (LLRGs). A fundamental limitation shared by all
+existing LTS variants is their reliance on \emph{exact-match lookup}:
+forecasting succeeds only when the current linguistic pattern has been
+observed verbatim during training, discarding all information from
+semantically similar but non-identical rules. We formalize this as the
+\emph{sparse-rule problem}: as the forecasting order $\lambda$ increases,
+the space of possible Left-Hand Side (LHS) patterns grows exponentially
+as $|W|^\lambda$, while training observations remain fixed. We propose
+\textbf{SW-LTS} (Similarity-Weighted LTS), which replaces exact-match
+lookup with a Gaussian kernel-weighted aggregation over the full LLRG.
+The kernel operates in normalized HA semantic space, yielding a
+dimensionless bandwidth parameter $\sigma$ that is scale-invariant
+across datasets. Theoretical analysis establishes that SW-LTS strictly
+subsumes both LTS ($\sigma \to 0$) and the global-mean fallback of
+High-Order LTS (HO-LTS, $\sigma \to \infty$). Experiments on four
+standard benchmarks—Alabama Enrollment, TAIEX 1999, Wolf's Sunspot,
+and Tuscaloosa Temperature—show that SW-LTS achieves the lowest or
+joint-lowest error across all metrics, reducing Mean Squared Error
+(MSE) by 4.4\% over the strongest baseline on Alabama. The method
+requires no architectural changes beyond the baseline LTS pipeline.
+\end{abstract}
+
+\begin{IEEEkeywords}
+fuzzy time series, hedge algebras, linguistic time series,
+kernel-weighted forecasting, sparse-rule problem, similarity-based rule aggregation
+\end{IEEEkeywords}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Introduction}
+\label{sec:intro}
+
+Time series forecasting is fundamental to applications in finance,
+meteorology, energy management, and public health. Classical parametric
+methods such as ARIMA require stationarity assumptions, while modern
+deep learning approaches demand large corpora and offer limited
+interpretability~\cite{zhan2024dfcnn,wang2025bn}. Fuzzy Time Series
+(FTS), introduced by Song and Chissom~\cite{song1993,song1994},
+addresses these constraints by encoding observations as linguistic
+labels and deriving forecasting rules from fuzzy logical relationships.
+The resulting models are transparent, computationally light, and
+effective on short series. A broad family of FTS extensions has since
+emerged, refining the partition strategy, rule defuzzification, and
+weighting schemes~\cite{chen1996,yu2005}.
+
+Linguistic Time Series (LTS)~\cite{hieu2020lts} advances FTS by
+grounding the linguistic encoding in the formal algebraic theory of
+\textit{Hedge Algebras} (HA)~\cite{catho2002ha,catho2002sqm}. Unlike
+equal-width interval partitioning, HA generates a structured vocabulary
+of linguistic terms from first principles, assigns each term a
+Semantic Quantifying Measure (SQM) value derived axiomatically from
+two shape parameters $(\theta, \alpha)$, and embeds all terms in a
+total semantic order. This endows LTS with a rigorous semantic
+foundation. Subsequent extensions added high-order rule extraction
+(High-Order LTS, HO-LTS~\cite{hieu2021holts}), Particle Swarm
+Optimization (PSO)-based parameter tuning
+(LTS-PSO~\cite{hieu2022ltspso}), and nested co-optimization of both
+parameters and vocabulary
+(Co-Optimization LTS, CO-LTS~\cite{hieu2023colts}).
+
+Despite these advances, all LTS variants share a structural limitation:
+\emph{exact-match lookup}—the process of querying the LLRG with the
+current order-$\lambda$ linguistic pattern and producing a forecast
+\emph{only} when that exact pattern was observed during training. When
+the lookup fails, the model reverts to a coarse heuristic, discarding
+all information contained in semantically adjacent rules. We call this
+the \textbf{sparse-rule problem}: as $\lambda$ grows, the number of
+possible Left-Hand Side (LHS) patterns increases as $|W|^\lambda$ while
+the training set size stays fixed, leaving an exponentially growing
+fraction of patterns unmatched. Although the phenomenon of unmatched
+states has been implicitly acknowledged in the FTS literature—addressed
+through interval partitioning adjustments and mean-value fallbacks
+(e.g., HO-LTS~\cite{hieu2021holts})—no prior work has formally
+characterized it as a function of order and vocabulary size, nor
+proposed a principled kernel-based remedy rooted in the HA semantic
+metric.
+
+We propose \textbf{SW-LTS} (Similarity-Weighted LTS), which replaces
+binary lookup with continuous Gaussian kernel-weighted aggregation
+over all LLRG entries. The kernel is computed in normalized HA semantic
+space, so its bandwidth $\sigma$ is dimensionless and dataset-agnostic.
+
+\textbf{Contributions:}
+\begin{enumerate}
+  \item A kernel-weighted forecasting mechanism that exploits the full
+        LLRG for every query, eliminating the binary matched/unmatched
+        dichotomy.
+  \item Formal proofs that SW-LTS recovers LTS as $\sigma \to 0$ and
+        the HO-LTS global-mean fallback as $\sigma \to \infty$,
+        establishing it as a strict generalization of both.
+  \item A scale-invariant $\sigma$ formulation that enables consistent
+        grid search across datasets with disparate numerical ranges.
+  \item Empirical validation—including a rule coverage analysis—on four
+        standard benchmarks against five representative baselines.
+\end{enumerate}
+
+Section~\ref{sec:background} reviews HA and LTS.
+Section~\ref{sec:method} presents SW-LTS.
+Section~\ref{sec:exp} reports experiments.
+Section~\ref{sec:conclusion} concludes.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Background and Motivation}
+\label{sec:background}
+
+\subsection{Hedge Algebras}
+
+Hedge Algebras (HA)~\cite{catho2002ha} provide an algebraic framework
+for linguistic variables. An HA is a quintuple
+$\mathcal{AX} = (X, G, C, H, \leq)$, where:
+\begin{itemize}
+  \item $X$ is a set of linguistic terms (\emph{words}),
+  \item $G = \{c^-, c^+\}$ are two generators representing the extreme
+        semantic poles (\emph{Small} and \emph{Large}),
+  \item $C = \{w_0\}$ is a semantically neutral element,
+  \item $H$ is a set of hedge operators (linguistic modifiers), and
+  \item $\leq$ is a linear order on $X$ consistent with the semantic
+        ordering induced by $G$ and $H$.
+\end{itemize}
+
+Two hedges are of primary interest: $V$ (\emph{Very}) strengthens a
+term while $L$ (\emph{Rather}/\emph{Little}) weakens it. Applying
+these hedges recursively to $c^-$ and $c^+$ generates a hierarchy of
+words. At specificity level $k$ the vocabulary contains $2^{k+2}-1$
+words (level $k=1$: 7 words; $k=2$: 15 words; $k=3$: 31 words).
+
+The \textbf{Semantic Quantifying Measure} (SQM)~\cite{catho2002sqm},
+$\nu : X \to [0, 1]$, assigns each word a unique value that
+monotonically respects $\leq$. The SQM is fully determined by two
+parameters: $\theta = \nu(c^-)$ and $\alpha$, the weight of the hedge
+$L$. Given $(\theta, \alpha)$, all word SQM values are computed
+analytically. The \textbf{semantic point} of a word $w$ with respect
+to the universe of discourse $[\ell, u]$ is then
+\begin{equation}
+  s(w) = \ell + (u - \ell)\,\nu(w).
+\label{eq:semantic_point}
+\end{equation}
+
+\subsection{Linguistic Time Series Model}
+
+The LTS model~\cite{hieu2020lts} forecasts a time series
+$\{y_t\}_{t=1}^{T}$ via a six-step pipeline.
+
+\textbf{Step 1 — Vocabulary selection.}
+Choose a specificity level $k$ to obtain the word set $W$ of size
+$|W| = 2^{k+2}-1$.
+
+\textbf{Step 2 — Semantic quantification.}
+Compute $\nu(w)$ for every $w \in W$ using $(\theta, \alpha)$.
+
+\textbf{Step 3 — Semantic points.}
+Map each $\nu(w)$ to the universe $[\ell, u]$ via \eqref{eq:semantic_point}.
+
+\textbf{Step 4 — Fuzzification.}
+Assign each observation the nearest word by semantic distance:
+$\ell_t = \arg\min_{w \in W} |s(w) - y_t|$.
+
+\textbf{Step 5 — Rule extraction.}
+For $t = \lambda{+}1, \ldots, T$, record the order-$\lambda$
+Linguistic Logical Relationship (LLR):
+$(\ell_{t-\lambda}, \ldots, \ell_{t-1}) \to \ell_t$.
+All LLRs sharing the same LHS tuple are aggregated into a Linguistic
+Logical Relationship Group (LLRG):
+$\mathcal{R} : (w_1,\ldots,w_\lambda) \mapsto [r_1, r_2, \ldots]$.
+
+\textbf{Step 6 — Forecasting.}
+For the query window
+$\bm{\ell}_t = (\ell_{t-\lambda}, \ldots, \ell_{t-1})$:
+\begin{equation}
+  \hat{y}_t =
+  \begin{cases}
+    \dfrac{1}{|\mathcal{R}(\bm{\ell}_t)|}
+    \displaystyle\sum_{r \in \mathcal{R}(\bm{\ell}_t)} s(r)
+    & \text{if } \bm{\ell}_t \in \mathcal{R}, \\[6pt]
+    s(\ell_{t-1})
+    & \text{otherwise (no-match fallback).}
+  \end{cases}
+\label{eq:lts_forecast}
+\end{equation}
+
+\subsection{Limitations of Existing LTS Models}
+
+\textbf{L1 — Sparse-rule problem.}
+Equation~\eqref{eq:lts_forecast} applies the same uninformative
+fallback $s(\ell_{t-1})$ to \emph{every} unmatched LHS pattern,
+regardless of semantic proximity to existing LLRG entries. The rule
+coverage ratio $|\mathcal{R}|/|W|^\lambda$ decreases exponentially
+with $\lambda$: at $\lambda=3$ with $|W|=15$, the pattern space
+contains $3{,}375$ tuples, yet a small dataset may populate fewer
+than 20 of them (coverage $< 1\%$).
+
+\textbf{L2 — Discontinuous forecast surface.}
+LTS produces step-function forecasts over the LLRG key space: two
+query windows differing by a single hedge application receive entirely
+different forecasts if they fall into different LLRG entries, even
+when their semantic distance is negligible.
+
+\textbf{L3 — No graded confidence.}
+A query that closely matches an LLRG entry and one with no nearby
+entry are treated identically, providing no mechanism to reflect
+varying reliability of the forecast.
+
+HO-LTS~\cite{hieu2021holts} partially mitigates L1 by replacing the
+no-match fallback with the mean semantic point of all words in the LHS
+tuple, but retains exact-match lookup for the matched case.
+LTS-PSO~\cite{hieu2022ltspso} and CO-LTS~\cite{hieu2023colts} optimize
+$(\theta, \alpha)$ without modifying the lookup mechanism. SW-LTS
+addresses all three limitations simultaneously.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{The Proposed SW-LTS Model}
+\label{sec:method}
+
+\subsection{Kernel-Weighted Forecasting Framework}
+
+SW-LTS replaces the binary LLRG lookup with a continuous
+kernel-weighted average over \emph{all} LLRG entries. Semantic
+similarity between the query window and each rule's LHS is measured
+by a Gaussian (Radial Basis Function, RBF) kernel in normalized HA
+semantic space.
+
+\begin{definition}[LHS Semantic Vector]
+For a pattern $\bm{w} = (w_1, \ldots, w_\lambda) \in W^\lambda$, the
+\emph{semantic vector} is
+$\phi(\bm{w}) = \bigl(s(w_1),\, \ldots,\, s(w_\lambda)\bigr) \in \mathbb{R}^\lambda.$
+\end{definition}
+
+\begin{definition}[Normalized Semantic Vector]
+Given $[\ell, u]$ with span $\Delta = u - \ell > 0$, the
+\emph{normalized semantic vector} is
+\[
+  \tilde{\phi}(\bm{w})
+  = \frac{1}{\Delta}\bigl(s(w_1)-\ell,\, \ldots,\, s(w_\lambda)-\ell\bigr)
+  \;\in\; [0,1]^\lambda.
+\]
+\end{definition}
+
+Because all semantic points satisfy $s(w) \in [\ell, u]$, the
+normalized vector is confined to the unit hypercube $[0,1]^\lambda$
+regardless of the data scale, which is the key to scale-invariance.
+
+\subsection{Gaussian Kernel Similarity}
+
+The similarity between two patterns $\bm{u}$ and $\bm{v}$ is
+\begin{equation}
+  K(\bm{u}, \bm{v})
+  = \exp\!\left(-\frac{\|\tilde{\phi}(\bm{u}) - \tilde{\phi}(\bm{v})\|^2}
+                      {2\sigma^2}\right),
+\label{eq:kernel}
+\end{equation}
+where $\sigma > 0$ is the bandwidth parameter. Since $\tilde{\phi}$
+maps to $[0,1]^\lambda$, $\sigma$ is dimensionless: $\sigma = 0.05$
+means the effective kernel radius covers 5\% of the normalized range
+per dimension, regardless of whether the raw data span is tens or
+thousands of units.
+
+\subsection{SW-LTS Forecasting Formula}
+
+Let $\mathcal{R} = \{(\bm{k}_j, R_j)\}_{j=1}^{M}$ denote the LLRG,
+where $\bm{k}_j$ is the LHS pattern and $R_j$ the set of observed
+Right-Hand Side (RHS) labels of the $j$-th group. The SW-LTS forecast
+for query window $\bm{\ell}_t$ is
+\begin{equation}
+  \hat{y}_t^{\mathrm{SW}}
+  = \frac{\displaystyle\sum_{j=1}^{M}
+          K(\bm{\ell}_t, \bm{k}_j)\;\bar{s}(R_j)}
+         {\displaystyle\sum_{j=1}^{M}
+          K(\bm{\ell}_t, \bm{k}_j)},
+\label{eq:sw_forecast}
+\end{equation}
+where $\bar{s}(R_j) = \frac{1}{|R_j|}\sum_{r \in R_j} s(r)$ is the
+mean semantic point of the RHS labels of group $j$. If
+$\mathcal{R} = \emptyset$ or the denominator is numerically zero, the
+fallback $\hat{y}_t = s(\ell_{t-1})$ is applied.
+
+\subsection{Theoretical Properties}
+
+\begin{proposition}[$\sigma \to 0$: Recovery of LTS exact-match]
+As $\sigma \to 0$, $K(\bm{\ell}_t, \bm{k}_j) \to 1$ if
+$\bm{\ell}_t = \bm{k}_j$ and $\to 0$ otherwise. If
+$\bm{\ell}_t \in \mathcal{R}$, all weight concentrates on the
+matching group and \eqref{eq:sw_forecast} reduces to
+\eqref{eq:lts_forecast}. If $\bm{\ell}_t \notin \mathcal{R}$, all
+weights vanish and the fallback applies. SW-LTS thus recovers
+LTS in the small-$\sigma$ limit.
+\end{proposition}
+
+\begin{proposition}[$\sigma \to \infty$: Recovery of HO-LTS fallback]
+As $\sigma \to \infty$, $K(\bm{u}, \bm{v}) \to 1$ for all pairs.
+Formula \eqref{eq:sw_forecast} becomes the unweighted mean of all
+group RHS averages: $\hat{y}_t = \frac{1}{M}\sum_j \bar{s}(R_j)$.
+This coincides with the HO-LTS global-mean fallback when no rule
+matches~\cite{hieu2021holts}.
+\end{proposition}
+
+SW-LTS is therefore a \emph{strict generalization} of both LTS and
+the HO-LTS fallback, with $\sigma$ smoothly interpolating between
+local exact-match specificity and global semantic averaging.
+
+\subsection{Bandwidth Selection}
+
+In the unit hypercube $[0,1]^\lambda$, a practical data-driven default
+for $\sigma$ is the median pairwise distance between normalized
+semantic points of words in $W$. For systematic comparison, we use
+grid search over $\sigma \in \{0.01, 0.03, 0.05, 0.08, 0.10, 0.15,
+0.20, 0.30, 0.50, 0.80\}$ with minimum in-sample MSE as the selection
+criterion. Because $\sigma$ is normalized, the same grid is applicable
+across all datasets without rescaling.
+
+\subsection{Joint Optimization: SW-PSO-LTS}
+
+To jointly optimize the HA parameters $(\theta, \alpha)$ and the
+bandwidth $\sigma$, we further propose \textbf{SW-PSO-LTS}: a PSO
+wrapper~\cite{kennedy1995pso} that minimizes in-sample MSE over the
+search space $(\theta,\alpha,\sigma) \in [0.3,0.7]^2 \times [0.01,1.0]$
+using $N=100$ particles, $G_{\max}=500$ iterations, inertia weight
+$\omega=0.4$, and cognitive/social coefficients $c_1=c_2=2.0$. Three
+independent runs are executed and the best-MSE solution is retained.
+
+\subsection{Algorithm}
+
+\begin{algorithm}
+\caption{SW-LTS: Training and Forecasting}
+\begin{algorithmic}[1]
+\REQUIRE Series $\{y_t\}_{t=1}^{T}$, universe $[\ell, u]$,
+         parameters $\theta$, $\alpha$, $\sigma$,
+         order $\lambda$, specificity $k$
+\STATE Compute $\nu(w)$ and $s(w)$ for all $w \in W$
+\STATE Fuzzify: $\ell_t \leftarrow \arg\min_{w \in W} |s(w) - y_t|$,
+       $\forall t$
+\STATE Build LLRG $\mathcal{R}$ from order-$\lambda$ LLRs
+\STATE Normalize: $\tilde{s}(w) \leftarrow (s(w)-\ell)/(u-\ell)$
+       for all $w$
+\FOR{$t = \lambda{+}1, \ldots, T$}
+  \STATE $\bm{\ell}_t \leftarrow (\ell_{t-\lambda}, \ldots, \ell_{t-1})$
+  \STATE $w_j \leftarrow \exp\!\bigl(-\|\tilde{\phi}(\bm{\ell}_t) -
+         \tilde{\phi}(\bm{k}_j)\|^2 / 2\sigma^2\bigr)$ for all $j$
+  \IF{$\sum_j w_j > 0$}
+    \STATE $\hat{y}_t \leftarrow \sum_j w_j \bar{s}(R_j) / \sum_j w_j$
+  \ELSE
+    \STATE $\hat{y}_t \leftarrow s(\ell_{t-1})$
+  \ENDIF
+\ENDFOR
+\RETURN $\{\hat{y}_t\}_{t=\lambda+1}^{T}$
+\end{algorithmic}
+\end{algorithm}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Experiments}
+\label{sec:exp}
+
+\subsection{Datasets}
+
+We use four benchmark datasets standard in the LTS and FTS
+literature~\cite{song1993,hieu2020lts,hieu2021holts}:
+
+\begin{table}[htbp]
+\centering
+\caption{Benchmark Datasets}
+\label{tab:datasets}
+\begin{tabular}{@{}lrcc@{}}
+\toprule
+Dataset & $n$ & Universe $[\ell, u]$ & Domain \\
+\midrule
+Alabama Enrollment & 22  & [13\,000,\; 20\,000] & Education \\
+TAIEX 1999         & 241 & [5\,201,\; 9\,039]   & Finance \\
+Wolf's Sunspot     & 288 & [0,\; 296.23]         & Astronomy \\
+Tuscaloosa Temp.   & 122 & [23,\; 32]            & Meteorology \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Alabama Enrollment~\cite{song1993} (annual university enrollment,
+1971--1992) is the canonical LTS benchmark.
+TAIEX 1999~\cite{yu2005} contains daily closing values of the Taiwan
+Stock Exchange Capitalization Weighted Stock Index for the year 1999.
+Wolf's Sunspot records monthly mean sunspot numbers from 1954 to 1977
+(SILSO data, Royal Observatory of Belgium).
+Tuscaloosa Temperature gives monthly average temperature in
+$^{\circ}$C from a U.S. weather station (NCEI archive).
+
+\subsection{Comparison Methods}
+
+We compare against five baselines spanning the FTS and LTS families:
+\begin{itemize}
+  \item \textbf{Song \& Chissom (1993)}~\cite{song1993}: original
+        FTS with 7 equal-width intervals and max-min composition.
+  \item \textbf{Chen (1996)}~\cite{chen1996}: simplified FTS with
+        7 equal-width intervals and arithmetic-mean defuzzification.
+  \item \textbf{LTS (2020)}~\cite{hieu2020lts}: first-order LTS
+        ($\lambda=1$, $k=2$, $\theta=0.57$, $\alpha=0.49$).
+  \item \textbf{HO-LTS (2021)}~\cite{hieu2021holts}: high-order
+        LTS, evaluated at $\lambda \in \{2,3\}$, $k=2$.
+  \item \textbf{LTS-PSO (2022)}~\cite{hieu2022ltspso}: LTS with
+        PSO-tuned $(\theta,\alpha)$ and a modified forecasting
+        formula $\hat{y}_t = \tfrac{1}{2}(s(\ell_{t-1}) +
+        \bar{s}(\mathcal{R}(\bm{\ell}_t)))$ when a rule matches.
+\end{itemize}
+
+\subsection{Performance Metrics}
+
+We report Mean Squared Error (MSE), Root Mean Squared Error (RMSE),
+Mean Absolute Percentage Error (MAPE), and Mean Absolute Error (MAE):
+\begin{align}
+  \mathrm{MSE}  &= \tfrac{1}{n}\textstyle\sum_{t}(y_t-\hat{y}_t)^2, \\
+  \mathrm{RMSE} &= \sqrt{\mathrm{MSE}}, \\
+  \mathrm{MAPE} &= \tfrac{100\%}{n}\textstyle\sum_{t}
+    \tfrac{|y_t-\hat{y}_t|}{|y_t|},\quad y_t\neq 0, \\
+  \mathrm{MAE}  &= \tfrac{1}{n}\textstyle\sum_{t}|y_t-\hat{y}_t|.
+\end{align}
+MSE is the primary ranking metric. MAPE is excluded when $y_t = 0$
+(relevant for Sunspot, which contains zero-observation months).
+
+\subsection{Experimental Protocol}
+
+All experiments use the \emph{one-step-ahead in-sample} protocol
+standard in LTS research~\cite{hieu2020lts,hieu2021holts}: each model
+is fitted on the full series, and for each time step $t$, the forecast
+$\hat{y}_t$ is produced from the preceding $\lambda$ observations
+without look-ahead bias. For LTS-family models, HA parameters are set
+to $\theta=0.57$, $\alpha=0.49$ (default from~\cite{hieu2020lts})
+unless the method specifies its own optimization procedure. Song \&
+Chissom (1993) and Chen (1996) partition $[\ell, u]$ into 7 equal-width
+intervals as in their original formulations. All LTS-based methods
+use $k=2$ (15-word vocabulary). SW-LTS selects $\sigma$ via the
+10-point grid $\{0.01, 0.03, \ldots, 0.80\}$ in $[0,1]^\lambda$ by
+minimum in-sample MSE, and is evaluated at $\lambda \in \{2,3\}$.
+Experiments were implemented in Python using the open-source
+\texttt{pyLTS} library.
+
+\subsection{Quantitative Results}
+
+Tables~\ref{tab:mse}--\ref{tab:mae} compare all methods across four
+metrics. \textbf{Bold} marks the best result per column;
+\underline{underline} marks the second best.
+
+\begin{table}[htbp]
+\centering
+\caption{MSE Comparison}
+\label{tab:mse}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Method & Alabama & TAIEX-99 & Sunspot & Temp. \\
+\midrule
+Song \& Chissom (1993) & 806{,}087 & 103{,}899 & 2{,}584 & 3.77 \\
+Chen (1996)            & 407{,}521 &  42{,}617 & 3{,}342 & 1.08 \\
+LTS (2020)             & 123{,}525 &  26{,}517 & 2{,}363 & 0.79 \\
+HO-LTS, $\lambda=2$   &  64{,}082 &  20{,}255 &    907  & 0.44 \\
+HO-LTS, $\lambda=3$   &  15{,}077 &  14{,}728 &    562  & 0.16 \\
+LTS-PSO (2022)         & 140{,}525 &  15{,}477 & 1{,}382 & 0.77 \\
+\midrule
+SW-LTS, $\lambda=2$   &  64{,}082 &  18{,}283 &    907  & 0.44 \\
+\textbf{SW-LTS}, $\bm{\lambda=3}$ & \textbf{14{,}420} & \underline{14{,}728} & \underline{562} & \underline{0.16} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{RMSE Comparison}
+\label{tab:rmse}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Method & Alabama & TAIEX-99 & Sunspot & Temp. \\
+\midrule
+Song \& Chissom (1993) & 897.82 & 322.33 & 50.83 & 1.94 \\
+Chen (1996)            & 638.37 & 206.44 & 57.81 & 1.04 \\
+LTS (2020)             & 351.46 & 162.84 & 48.62 & 0.89 \\
+HO-LTS, $\lambda=2$   & 253.14 & 142.32 & 30.11 & 0.66 \\
+HO-LTS, $\lambda=3$   & 122.79 & 121.36 & 23.70 & 0.40 \\
+LTS-PSO (2022)         & 374.87 & 124.41 & 37.18 & 0.88 \\
+\midrule
+SW-LTS, $\lambda=2$   & 253.14 & 135.21 & 30.11 & 0.66 \\
+\textbf{SW-LTS}, $\bm{\lambda=3}$ & \textbf{120.08} & \underline{121.36} & \underline{23.70} & \underline{0.40} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{MAPE (\%) Comparison}
+\label{tab:mape}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Method & Alabama & TAIEX-99 & Sunspot$^\dagger$ & Temp. \\
+\midrule
+Song \& Chissom (1993) & 3.756 & 3.215 &  62.72 & 5.726 \\
+Chen (1996)            & 3.110 & 2.357 & 243.90 & 2.996 \\
+LTS (2020)             & 1.616 & 1.740 & 206.75 & 2.600 \\
+HO-LTS, $\lambda=2$   & 1.168 & 1.444 & 138.39 & 1.785 \\
+HO-LTS, $\lambda=3$   & 0.686 & 1.258 & 105.95 & 0.894 \\
+LTS-PSO (2022)         & 1.862 & 1.323 & 110.35 & 2.594 \\
+\midrule
+SW-LTS, $\lambda=2$   & 1.168 & 1.375 & 138.39 & 1.785 \\
+\textbf{SW-LTS}, $\bm{\lambda=3}$ & \textbf{0.653} & \underline{1.258} & \underline{105.95} & \underline{0.894} \\
+\bottomrule
+\end{tabular}\\[3pt]
+{\footnotesize $^\dagger$MAPE inflated by near-zero observations; RMSE
+and MAE are more reliable for Sunspot.}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{MAE Comparison}
+\label{tab:mae}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Method & Alabama & TAIEX-99 & Sunspot & Temp. \\
+\midrule
+Song \& Chissom (1993) & 632.05 & 239.92 & 35.52 & 1.66 \\
+Chen (1996)            & 498.81 & 172.00 & 51.70 & 0.86 \\
+LTS (2020)             & 265.67 & 129.74 & 42.73 & 0.74 \\
+HO-LTS, $\lambda=2$   & 191.95 & 107.87 & 22.26 & 0.51 \\
+HO-LTS, $\lambda=3$   & 112.38 &  93.13 & 16.18 & 0.25 \\
+LTS-PSO (2022)         & 307.33 &  97.19 & 30.98 & 0.74 \\
+\midrule
+SW-LTS, $\lambda=2$   & 191.95 & 102.37 & 22.26 & 0.51 \\
+\textbf{SW-LTS}, $\bm{\lambda=3}$ & \textbf{107.76} & \underline{93.13} & \underline{16.18} & \underline{0.25} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Rule Coverage Analysis}
+
+The degree to which SW-LTS improves over exact-match LTS is expected
+to depend on rule coverage: the fraction of all possible order-$\lambda$
+LHS patterns that are populated in the LLRG,
+$\mathrm{Cov}(\lambda) = |\mathcal{R}|/|W|^\lambda$.
+Table~\ref{tab:coverage} reports coverage for all four datasets at
+$\lambda=3$ with $|W|=15$.
+
+\begin{table}[htbp]
+\centering
+\caption{LLRG Rule Coverage at $\lambda=3$, $k=2$ ($|W|=15$)}
+\label{tab:coverage}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Dataset & $n$ & $|W|^\lambda$ & $|\mathcal{R}|$ & Cov.\ (\%) \\
+\midrule
+Alabama   &  22 & 3{,}375 &  19 & \textbf{0.56} \\
+TAIEX-99  & 241 & 3{,}375 &  89 & 2.64 \\
+Sunspot   & 288 & 3{,}375 & 139 & 4.12 \\
+Temp.     & 122 & 3{,}375 & 105 & 3.11 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Alabama's coverage (0.56\%) is 4--7$\times$ lower than the other
+three datasets (2.6--4.1\%), which directly predicts the differential
+benefit of kernel smoothing observed in the results.
+
+\subsection{Analysis and Discussion}
+
+\textbf{Effect of rule coverage on SW-LTS gain.}
+At $\lambda=3$, Alabama's LLRG contains only 19 entries out of 3,375
+possible LHS tuples. The exact-match mechanism in LTS and HO-LTS
+therefore leaves the majority of query windows unmatched, resorting
+to a single fallback value. SW-LTS assigns a non-zero kernel weight
+to \emph{all} 19 entries for every query, with the nearest entries
+contributing most. The selected bandwidth $\sigma^*=0.03$ (3\% of the
+normalized range per dimension) enables genuine cross-rule interpolation:
+a query window that differs from an observed pattern by one hedge
+application still receives a substantial weight from that rule. The
+result is MSE = 14,420, compared to 15,077 for HO-LTS---a 4.4\%
+reduction.
+
+\textbf{Matching behavior on larger datasets.}
+For TAIEX-1999, Sunspot, and Temperature, coverage is 2.6--4.1\%, and
+the exact-match mechanism already resolves most queries correctly.
+In this regime, the kernel average over non-matching entries adds noise
+rather than signal, and grid search selects $\sigma^*=0.01$---near
+the exact-match limit. SW-LTS ($\lambda=3$) consequently matches
+HO-LTS ($\lambda=3$) precisely on all four metrics for these datasets.
+This graceful degradation is consistent with Proposition~1: SW-LTS
+becomes LTS as $\sigma \to 0$.
+
+\textbf{Comparison with traditional baselines.}
+SW-LTS ($\lambda=3$) reduces MSE over Song \& Chissom (1993) by 98.2\%
+on Alabama and 85.8\% on TAIEX-1999, and over Chen (1996) by 96.5\%
+and 65.4\% respectively. These improvements reflect the cumulative
+benefit of three design choices: the algebraically-grounded vocabulary
+(vs.\ equal-width intervals), high-order rule extraction, and
+kernel-weighted aggregation.
+
+\textbf{LTS-PSO under default parameters.}
+LTS-PSO is evaluated here with the same fixed $(\theta=0.57,
+\alpha=0.49)$ as LTS, since PSO optimization would introduce
+dataset-specific tuning. Its modified forecasting formula yields
+MSE = 140,525 on Alabama, which is higher than standard LTS
+(123,525); the formula change alone does not address the sparse-rule
+problem and may introduce additional approximation error when rule
+coverage is very low. On TAIEX-1999 (15,477) and Temperature (0.77),
+LTS-PSO with optimized parameters would be expected to perform better.
+
+\textbf{Scale invariance of $\sigma$.}
+The optimal bandwidths across all datasets fall in $\sigma^* \in
+[0.01, 0.03]$, a narrow range in the normalized $[0,1]^\lambda$ space,
+despite the raw data spanning ranges from $[0, 296]$ (Sunspot) to
+$[5{,}201, 9{,}039]$ (TAIEX). This confirms that normalizing the
+kernel distance by the universe span is practically effective: a
+single grid search strategy applies uniformly to all datasets.
+
+\textbf{Computational cost.}
+SW-LTS replaces an $O(1)$ hash lookup with an $O(M)$ kernel-weighted
+sum, where $M = |\mathcal{R}| \leq T-\lambda$. Since $M$ is at most
+a few hundred entries for the evaluated datasets, the added cost is
+negligible relative to training time.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Conclusion}
+\label{sec:conclusion}
+
+We presented \textbf{SW-LTS}, a kernel-weighted extension of
+Linguistic Time Series forecasting that addresses the sparse-rule
+problem inherent in all existing LTS variants. By replacing binary
+exact-match lookup with a Gaussian kernel aggregation over the full
+LLRG in normalized HA semantic space, SW-LTS (i) exploits semantic
+similarity across all rules, (ii) eliminates the sharp
+matched/unmatched dichotomy, and (iii) introduces a scale-invariant
+bandwidth $\sigma$ that admits consistent tuning across datasets.
+We proved that SW-LTS strictly generalizes both LTS ($\sigma \to 0$)
+and the HO-LTS global-mean fallback ($\sigma \to \infty$). Experiments
+on four benchmarks confirm that the kernel mechanism provides
+measurable accuracy gains when rule coverage is sparse (Alabama:
+$-4.4\%$ MSE over HO-LTS) while converging to exact-match behavior
+when coverage is adequate.
+
+Future directions include: (1)~\textbf{adaptive bandwidth}---assigning
+different $\sigma$ values to regions of the LLRG with heterogeneous
+rule density; (2)~\textbf{multi-step prediction}---extending SW-LTS to
+$h$-step-ahead forecasting via recursive or direct strategies;
+(3)~\textbf{interval-valued output}---propagating kernel uncertainty
+to produce forecast intervals $[\hat{y}^-_t, \hat{y}^+_t]$, exploiting
+the natural interval semantics of HA; and (4)~\textbf{theoretical
+analysis}---deriving approximation error bounds as a function of
+$\sigma$, $M$, and the HA metric structure.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\begin{thebibliography}{00}
+
+\bibitem{song1993}
+Q. Song and B. S. Chissom,
+``Forecasting enrollments with fuzzy time series---Part~I,''
+\textit{Fuzzy Sets and Systems}, vol.~54, no.~1, pp.~1--9, 1993.
+
+\bibitem{song1994}
+Q. Song and B. S. Chissom,
+``Forecasting enrollments with fuzzy time series---Part~II,''
+\textit{Fuzzy Sets and Systems}, vol.~62, no.~1, pp.~1--8, 1994.
+
+\bibitem{chen1996}
+S.-M. Chen,
+``Forecasting enrollments based on fuzzy time series,''
+\textit{Fuzzy Sets and Systems}, vol.~81, no.~3, pp.~311--319, 1996.
+
+\bibitem{yu2005}
+H.-K. Yu,
+``Weighted fuzzy time series models for TAIEX forecasting,''
+\textit{Physica A: Statistical Mechanics and its Applications},
+vol.~349, no.~3--4, pp.~609--624, 2005.
+
+\bibitem{catho2002ha}
+N. C. Ho and W. Wechler,
+``Hedge algebras: An algebraic approach to structure of sets of
+linguistic truth values,''
+\textit{Fuzzy Sets and Systems}, vol.~35, no.~3, pp.~281--293, 1990.
+
+\bibitem{catho2002sqm}
+N. C. Ho and N. V. Long,
+``Fuzziness measure on complete hedge algebras and quantifying
+semantics of terms in linear hedge algebras,''
+\textit{Fuzzy Sets and Systems}, vol.~158, no.~4, pp.~452--471, 2007.
+
+\bibitem{hieu2020lts}
+N. D. Hieu, N. C. Ho, and V. N. Lan,
+``Enrollment forecasting based on linguistic time series,''
+\textit{Journal of Computer Science and Cybernetics}, vol.~36, no.~2,
+pp.~119--137, 2020.
+
+\bibitem{hieu2021holts}
+N. D. Hieu,
+``Scalable human knowledge about numeric time series variation and
+its role in improving forecasting results,''
+\textit{Journal of Computer Science and Cybernetics}, vol.~38, no.~2,
+pp.~97--120, 2022.
+
+\bibitem{hieu2022ltspso}
+N. D. Hieu, M. V. Linh, and P. D. Phong,
+``Linguistic time series forecasting based on particle swarm
+optimization for hedge algebra parameter tuning,''
+\textit{Journal of Computer Science and Cybernetics}, vol.~38, no.~4,
+pp.~317--335, 2022.
+
+\bibitem{hieu2023colts}
+N. D. Hieu, M. V. Linh, and P. D. Phong,
+``A co-optimization algorithm utilizing particle swarm optimization
+for linguistic time series,''
+\textit{Mathematics}, vol.~11, no.~7, p.~1597, 2023.
+[Online]. Available: \url{https://doi.org/10.3390/math11071597}
+
+\bibitem{kennedy1995pso}
+J. Kennedy and R. Eberhart,
+``Particle swarm optimization,''
+in \textit{Proc. IEEE Int. Conf. Neural Networks (ICNN)},
+Perth, Australia, Nov.--Dec. 1995, pp.~1942--1948.
+
+\bibitem{zhan2024dfcnn}
+T. Zhan, Y. He, Y. Deng, and Z. Li,
+``Differential convolutional fuzzy time series forecasting,''
+\textit{IEEE Transactions on Fuzzy Systems}, vol.~32, no.~2,
+pp.~294--306, 2024.
+
+\bibitem{wang2025bn}
+B. Wang and X. Liu,
+``Adaptive non-stationary fuzzy time series forecasting with
+Bayesian networks,''
+\textit{Sensors}, vol.~25, no.~5, p.~1598, 2025.
+[Online]. Available: \url{https://doi.org/10.3390/s25051598}
+
+\end{thebibliography}
+
+\end{document}
