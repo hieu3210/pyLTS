@@ -1,6 +1,6 @@
 # pyLTS — Linguistic Time Series Forecasting
 
-Python implementation của mô hình dự báo chuỗi thời gian ngôn ngữ (LTS) dựa trên Hedge Algebras, chuẩn hóa theo bài báo:
+Chương trình thực nghiệm Python của mô hình dự báo chuỗi thời gian ngôn ngữ (LTS) dựa trên Hedge Algebras, chuẩn hóa theo bài báo:
 
 > **Nguyen Duy Hieu, Nguyen Cat Ho, Vu Nhu Lan (2020).**  
 > "Enrollment Forecasting Based on Linguistic Time Series."  
@@ -19,7 +19,7 @@ Từ vựng mặc định gồm 7 nhãn: `Very Small`, `Small`, `Rather Small`, 
 1. Định nghĩa Hedge Algebra với tham số `(θ, α)`
 2. Tính SQM — ánh xạ từ → `[0, 1]`
 3. Tính semantic points — ánh xạ từ → `[lb, ub]`
-4. Fuzzification — gán nhãn ngôn ngữ cho từng điểm dữ liệu
+4. Ngữ nghĩa hóa — gán nhãn ngôn ngữ cho từng điểm dữ liệu
 5. Xây dựng LLRGs (Linguistic Logical Relationship Groups)
 6. Dự báo — trung bình semantic points của RHS
 
